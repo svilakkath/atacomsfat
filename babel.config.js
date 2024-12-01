@@ -28,5 +28,6 @@ module.exports = {
         regenerator: true,
       },
     ],
+    ['@babel/plugin-proposal-decorators', {legacy: true}],
   ],
 };
