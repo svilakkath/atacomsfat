@@ -2,6 +2,9 @@ import {Model} from '@nozbe/watermelondb';
 import {field, readonly} from '@nozbe/watermelondb/decorators';
 
 export default class User extends Model {
+  // set(foundUser: Model) {
+  //   throw new Error('Method not implemented.');
+  // }
   static table = 'users'; // Table name
 
   @field('full_name') fullName!: string;

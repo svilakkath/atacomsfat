@@ -1,4 +1,4 @@
-import { MD3TypescaleKey } from 'react-native-paper';
+import {MD3TypescaleKey} from 'react-native-paper';
 
 export type CustomTextType =
   | MD3TypescaleKey
@@ -18,9 +18,19 @@ export type CustomTextType =
   | 'labelTextMedium'
   | 'labelTextSmall';
 
-export type CustomButtonModes = 'text' | 'outlined' | 'contained' | 'elevated' | 'contained-tonal';
+export type CustomButtonModes =
+  | 'text'
+  | 'outlined'
+  | 'contained'
+  | 'elevated'
+  | 'contained-tonal';
 export type ButtonVariantType = 'primary' | 'secondary' | 'secondaryDisabled';
 export type ToastTypes = 'success' | 'error' | 'info' | 'close';
 export type TextInputTypes = 'primary' | 'secondary';
-export type LoginError = 'credentialError' | 'emailError' | 'passwordError' | '';
+export type LoginError =
+  | 'credentialError'
+  | 'emailError'
+  | 'passwordError'
+  | '';
 export type IconTypes = 'password' | 'close' | 'magnify';
+export type DayTimeValues = 'Morning' | 'Afternoon' | 'Evening' | 'Night';
