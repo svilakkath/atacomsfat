@@ -23,7 +23,7 @@ type FormState = {
   additionalNote: string;
   remainingNumberOfMedicine: string;
   timeOfDay: DayTimeValues[];
-  dayTimeValues: Record<DayTimeValues, string>;
+  dayTimeValues: Record<string, string>;
 };
 type MedicineTimingProps = {
   timeOfDay: string;
@@ -40,6 +40,7 @@ type MedicineDetailsProps = {
   remainingNumberOfMedicine?: number;
   wellnessPartner: WellnessPartner;
 };
+
 export default function AddMedicineDetails() {
   const [form, setForm] = useState<FormState>({
     name: '',
@@ -49,15 +50,11 @@ export default function AddMedicineDetails() {
     additionalNote: '',
     remainingNumberOfMedicine: '',
     timeOfDay: [],
-    dayTimeValues: {
-      Morning: '',
-      Afternoon: '',
-      Evening: '',
-      Night: '',
-    },
+    dayTimeValues: {},
   });
 
   const addMedicinDetails = async () => {
+    sanitizeForm();
     const {
       name,
       doseDetails,
@@ -122,8 +119,7 @@ export default function AddMedicineDetails() {
 
         if (medicineDetailsResponseData) {
           Object.entries(dayTimeValues).forEach(async ([timeOfDays, times]) => {
-            console.log('Processing time of day:', timeOfDays);
-            console.log('Time:', times);
+            console.log('times====>', timeOfDays, times);
 
             await medicineTimingDetails.create((record: Model) => {
               const medicineTimingDetailsValues =
@@ -163,17 +159,36 @@ export default function AddMedicineDetails() {
 
   const handleSelectTimeOfDay = (value: DayTimeValues) => {
     setForm(prevForm => {
-      const {timeOfDay} = prevForm;
+      const {timeOfDay, dayTimeValues} = prevForm;
       if (timeOfDay.includes(value)) {
+        const updatedTimeOfDay = timeOfDay.filter(item => item !== value);
+        const updatedDayTimeValues = {...dayTimeValues, [value]: ''};
         return {
           ...prevForm,
-          timeOfDay: timeOfDay.filter(item => item !== value),
-          dayTimeValues: {...prevForm.dayTimeValues, [value]: ''},
+          timeOfDay: updatedTimeOfDay,
+          dayTimeValues: updatedDayTimeValues,
         };
       } else {
-        return {...prevForm, timeOfDay: [...timeOfDay, value]};
+        const updatedTimeOfDay = [...timeOfDay, value];
+        const updatedDayTimeValues = {...dayTimeValues, [value]: ''};
+        return {
+          ...prevForm,
+          timeOfDay: updatedTimeOfDay,
+          dayTimeValues: updatedDayTimeValues,
+        };
       }
     });
+  };
+  const sanitizeForm = () => {
+    const sanitizedTimeInputs = Object.fromEntries(
+      Object.entries(form.dayTimeValues).filter(([timeOfDay, _]) =>
+        form.timeOfDay.includes(timeOfDay as DayTimeValues),
+      ),
+    );
+    return {
+      ...form,
+      dayTimeValues: sanitizedTimeInputs,
+    };
   };
   const handleInputChange = (field: keyof FormState, value: string) => {
     setForm({...form, [field]: value});
@@ -182,18 +197,19 @@ export default function AddMedicineDetails() {
   const handleTimeInputChange = (timeOfDay: DayTimeValues, value: string) => {
     if (value.length <= 5) {
       if (value.length === 2 && !value.includes(':')) {
-        value = value + ':';
+        value = value + ':'; // Ensure the time has the correct format (hh:mm)
       }
       if (value.length > 2 && !value.includes(':') && value.length === 3) {
         value = value.slice(0, 2) + ':' + value.slice(2);
       }
-      setForm(prevForm => ({
-        ...prevForm,
-        dayTimeValues: {
+
+      setForm(prevForm => {
+        const updatedDayTimeValues = {
           ...prevForm.dayTimeValues,
           [timeOfDay]: value,
-        },
-      }));
+        };
+        return {...prevForm, dayTimeValues: updatedDayTimeValues};
+      });
     }
   };
 
@@ -201,7 +217,7 @@ export default function AddMedicineDetails() {
     timeOfDay: DayTimeValues,
     format: 'AM' | 'PM',
   ) => {
-    const time = form.dayTimeValues[timeOfDay].split(' ')[0];
+    const time = (form.dayTimeValues[timeOfDay] || '').split(' ')[0]; // Safeguard against undefined
     setForm(prevForm => ({
       ...prevForm,
       dayTimeValues: {
@@ -212,18 +228,10 @@ export default function AddMedicineDetails() {
   };
 
   const handleSubmit = async () => {
-    const sanitizedTimeInputs = Object.fromEntries(
-      Object.entries(form.dayTimeValues).filter(([timeOfDay, _]) =>
-        form.timeOfDay.includes(timeOfDay as DayTimeValues),
-      ),
-    );
-
-    const sanitizedForm = {
-      ...form,
-      dayTimeValues: sanitizedTimeInputs,
-    };
-    // setForm(sanitizedForm);
-    console.log('Sanitized Form:', sanitizedForm.dayTimeValues);
+    const sanitizedForm = sanitizeForm();
+    console.log('Sanitized Form:', sanitizedForm);
+    // Call your function to save the data in the database here
+    // await addMedicinDetails(sanitizedForm);
   };
 
   const dayTimes: DayTimeValues[] = [
@@ -307,7 +315,7 @@ export default function AddMedicineDetails() {
               <View style={{width: '30%'}}>
                 <TextInput
                   style={styles.input}
-                  value={form.dayTimeValues[time].split(' ')[0]} // Show time only
+                  value={(form.dayTimeValues[time] || '').split(' ')[0]}
                   onChangeText={value => handleTimeInputChange(time, value)}
                   placeholder="hh:mm"
                   keyboardType="numeric"
@@ -318,16 +326,17 @@ export default function AddMedicineDetails() {
                 <TouchableOpacity
                   style={[
                     styles.formatButton,
-                    form.dayTimeValues[time].endsWith('AM') &&
+                    (form.dayTimeValues[time] || '').endsWith('AM') &&
                       styles.selectedFormatButton,
                   ]}
                   onPress={() => handleTimeFormatChange(time, 'AM')}>
                   <Text style={styles.formatText}>AM</Text>
                 </TouchableOpacity>
+
                 <TouchableOpacity
                   style={[
                     styles.formatButton,
-                    form.dayTimeValues[time].endsWith('PM') &&
+                    (form.dayTimeValues[time] || '').endsWith('PM') &&
                       styles.selectedFormatButton,
                   ]}
                   onPress={() => handleTimeFormatChange(time, 'PM')}>
