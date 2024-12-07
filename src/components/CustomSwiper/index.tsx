@@ -1,5 +1,6 @@
 import React, {forwardRef, useImperativeHandle, useRef, useState} from 'react';
-import {Animated, Dimensions, ScrollView, StyleSheet, View} from 'react-native';
+import {Animated, Dimensions, ScrollView, View} from 'react-native';
+import useStyles from './styles';
 
 const {width} = Dimensions.get('window');
 
@@ -13,6 +14,7 @@ const CustomSwiper = forwardRef(
   ({children, onPageChanged}: SwiperProps, ref: any) => {
     const scrollViewRef = useRef<ScrollView | null>(null);
     const [currentPage, setCurrentPage] = useState(0);
+    const styles = useStyles();
 
     const scrollX = useRef(new Animated.Value(0)).current;
 
@@ -78,34 +80,5 @@ const CustomSwiper = forwardRef(
     );
   },
 );
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  page: {
-    width, // Each page takes full screen width
-    flex: 1,
-  },
-  pagination: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    position: 'absolute',
-    bottom: 20,
-    width: '100%',
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginHorizontal: 5,
-  },
-  activeDot: {
-    backgroundColor: '#000',
-  },
-  inactiveDot: {
-    backgroundColor: '#ccc',
-  },
-});
 
 export default CustomSwiper;

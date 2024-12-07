@@ -24,7 +24,7 @@ type UserDetailsProps = {
 
 export default function AddWellnessPartner() {
   // const { user } = useAuth();
-  const userId = '12tsf5saazxcvhbj';
+  // const userId = '12tsf5saazxcvhbj';
   const [form, setForm] = useState({
     fullName: '',
     phoneNumber: '',
@@ -54,7 +54,7 @@ export default function AddWellnessPartner() {
           console.error('No user found with the provided userAuthId');
           return;
         }
-        const foundUser = users[0];
+        // const foundUser = users[0];
 
         await wellnessPartnerCollection.create((record: Model) => {
           const wellnessPartner = record as unknown as WellnessPartnerProps;
@@ -64,7 +64,7 @@ export default function AddWellnessPartner() {
           wellnessPartner.gender = gender;
           wellnessPartner.profileImage = profileImage || undefined;
 
-          wellnessPartner.user.set(foundUser);
+          // wellnessPartner.user.set(foundUser);
         });
 
         console.log('Wellness Partner added successfully');
@@ -99,11 +99,11 @@ export default function AddWellnessPartner() {
     console.log('wellness partners ==>', formattedPartners);
   };
 
-  const getAllUser = async () => {
-    const wellnessPartnerCollection = await database.get('users');
-    const partners = await wellnessPartnerCollection.query().fetch();
-    const formattedPartners = partners.map((partner: any) => partner._raw);
-  };
+  // const getAllUser = async () => {
+  //   const wellnessPartnerCollection = await database.get('users');
+  //   const partners = await wellnessPartnerCollection.query().fetch();
+  //   const formattedPartners = partners.map((partner: any) => partner._raw);
+  // };
 
   const addNewUser = async () => {
     try {

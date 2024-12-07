@@ -9,7 +9,7 @@ type FormFields = {
   password: string;
 };
 
-const Login = () => {
+const SignUp = () => {
   const swiperRef = useRef<any>(null);
   const [currentPage, setCurrentPage] = useState(0);
 
@@ -124,18 +124,19 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+    padding: 16,
   },
   slide: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
     padding: 20,
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '80%',
+    width: '90%',
     marginTop: 20,
   },
   label: {
@@ -143,15 +144,18 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     fontWeight: 'bold',
     color: '#333',
+    alignSelf: 'flex-start',
   },
   input: {
+    width: '100%',
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 5,
-    padding: 10,
+    borderRadius: 8,
+    padding: 12,
     fontSize: 16,
     marginBottom: 15,
+    backgroundColor: '#fff',
   },
 });
 
-export default Login;
+export default SignUp;
