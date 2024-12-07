@@ -1,8 +1,8 @@
 import React from 'react';
-import { Button } from 'react-native-paper';
+import {Button} from 'react-native-paper';
 
-import { useAppTheme } from '@/assets/theme';
-import { ButtonVariantType, CustomButtonModes } from '@/types/common';
+import {useAppTheme} from '@/assets/theme';
+import {ButtonVariantType, CustomButtonModes} from '@/types/common';
 import Text from '../Text';
 import useStyles from './styles';
 
@@ -30,7 +30,7 @@ export default function CustomButton({
   disabledType,
   accessibilityHint,
 }: ButtonProps) {
-  const { colors } = useAppTheme();
+  const {colors} = useAppTheme();
   const styles = useStyles();
   let textColor = `${variant}Button`;
   if (disabled && disabledType) {
@@ -39,16 +39,17 @@ export default function CustomButton({
   return (
     <Button
       style={[
-        { ...styles.button },
-        disabled && disabledType ? { backgroundColor: colors[`${disabledType}Button`] } : null,
+        {...styles.button},
+        disabled && disabledType
+          ? {backgroundColor: colors[`${disabledType}Button`]}
+          : null,
       ]}
       mode={mode ?? 'contained'}
       buttonColor={buttonColor ?? colors[`${variant}Button`]}
       disabled={disabled ?? false}
       accessibilityLabel={accessibilityLabel}
       accessibilityHint={accessibilityHint}
-      onPress={onPress}
-    >
+      onPress={onPress}>
       <Text color={textColor} title={title} />
     </Button>
   );

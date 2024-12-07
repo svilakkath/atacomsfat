@@ -1,12 +1,12 @@
-import Text from '@/components/Text';
+import AppNavigator from '@/navigations';
+import {NavigationContainer} from '@react-navigation/native';
 import React from 'react';
-import {View} from 'react-native';
 
 function App() {
   return (
-    <View>
-      <Text title="text component" color="red" />
-    </View>
+    <NavigationContainer>
+      <AppNavigator />
+    </NavigationContainer>
   );
 }
 export default App;
