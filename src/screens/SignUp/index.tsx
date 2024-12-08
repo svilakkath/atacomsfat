@@ -1,6 +1,8 @@
+import {TextInput} from '@/components';
 import Swiper from '@/components/CustomSwiper';
 import React, {useRef, useState} from 'react';
-import {Button, StyleSheet, Text, TextInput, View} from 'react-native';
+import {Button, Text, View} from 'react-native';
+import useStyles from './styles';
 
 type FormFields = {
   fullName: string;
@@ -12,6 +14,7 @@ type FormFields = {
 const SignUp = () => {
   const swiperRef = useRef<any>(null);
   const [currentPage, setCurrentPage] = useState(0);
+  const styles = useStyles();
 
   const [form, setForm] = useState<FormFields>({
     fullName: '',
@@ -70,39 +73,39 @@ const SignUp = () => {
       <Swiper
         ref={swiperRef}
         onPageChanged={(pageIndex: number) => setCurrentPage(pageIndex)}>
-        <View>
-          <Text style={styles.label}>Full Name</Text>
-          <TextInput
-            style={styles.input}
-            value={form.fullName}
-            onChangeText={value => handleInputChange('fullName', value)}
-            placeholder="Enter full name"
-          />
-          <Text style={styles.label}>Phone Number</Text>
-          <TextInput
-            style={styles.input}
-            value={form.phoneNumber}
-            onChangeText={value => handleInputChange('phoneNumber', value)}
-            placeholder="Enter phone number"
-            keyboardType="phone-pad"
-          />
+        <View
+          style={{
+            width: '100%',
+            height: '100%',
+          }}>
+          <View>
+            <Text style={styles.label}>Full Name</Text>
+            <TextInput
+              value={form.fullName}
+              onChangeText={value => handleInputChange('fullName', value)}
+              placeHolder="Enter full name"
+            />
+            <Text style={styles.label}>Phone Number</Text>
+            <TextInput
+              value={form.phoneNumber}
+              onChangeText={value => handleInputChange('phoneNumber', value)}
+              placeHolder="Enter phone number"
+            />
+          </View>
         </View>
 
-        <View>
+        <View style={{width: '100%', height: '100%'}}>
           <Text style={styles.label}>Email Address</Text>
           <TextInput
-            style={styles.input}
             value={form.emailAddress}
             onChangeText={value => handleInputChange('emailAddress', value)}
-            placeholder="Enter email address"
-            keyboardType="email-address"
+            placeHolder="Enter email address"
           />
           <Text style={styles.label}>Password</Text>
           <TextInput
-            style={styles.input}
             value={form.password}
             onChangeText={value => handleInputChange('password', value)}
-            placeholder="Enter new password"
+            placeHolder="Enter password"
             secureTextEntry
           />
         </View>
@@ -118,44 +121,5 @@ const SignUp = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    padding: 16,
-  },
-  slide: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '90%',
-    marginTop: 20,
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 8,
-    fontWeight: 'bold',
-    color: '#333',
-    alignSelf: 'flex-start',
-  },
-  input: {
-    width: '100%',
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    marginBottom: 15,
-    backgroundColor: '#fff',
-  },
-});
 
 export default SignUp;

@@ -1,21 +1,22 @@
+import {TextInput} from '@/components';
 import {database} from '@/database/database';
 import MedicineDetails from '@/database/models/medicineDetails';
-import WellnessPartner from '@/database/models/WellnessPartner';
-import {Model, Q} from '@nozbe/watermelondb';
+import MedicineTiming from '@/database/models/medicineTiming';
+import {Q} from '@nozbe/watermelondb';
 import React, {useState} from 'react';
 import {
   Button,
+  TextInput as RnTextInput,
   ScrollView,
-  StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
+import useStyles from './styles';
 
 export type DayTimeValues = 'Morning' | 'Afternoon' | 'Evening' | 'Night';
 
-type FormState = {
+type MedicineFormState = {
   name: string;
   doseDetails: string;
   medicineType: string;
@@ -25,24 +26,11 @@ type FormState = {
   timeOfDay: DayTimeValues[];
   dayTimeValues: Record<string, string>;
 };
-type MedicineTimingProps = {
-  timeOfDay: string;
-  time: string;
-  medicine: MedicineDetails;
-};
-
-type MedicineDetailsProps = {
-  name: string;
-  doseDetails: string;
-  medicineType?: string;
-  medicineDuration?: number;
-  additionalNote?: string;
-  remainingNumberOfMedicine?: number;
-  wellnessPartner: WellnessPartner;
-};
 
 export default function AddMedicineDetails() {
-  const [form, setForm] = useState<FormState>({
+  const styles = useStyles();
+
+  const [form, setForm] = useState<MedicineFormState>({
     name: '',
     doseDetails: '',
     medicineType: '',
@@ -66,8 +54,10 @@ export default function AddMedicineDetails() {
     } = form;
 
     try {
-      const medicineDetails = database.get('medicines_details');
-      const medicineTimingDetails = database.get('medicine_timings');
+      const medicineDetails =
+        database.get<MedicineDetails>('medicines_details');
+      const medicineTimingDetails =
+        database.get<MedicineTiming>('medicine_timings');
 
       const userCollection = database.get('users');
       const wellnessPartnerDetails = database.get('wellness_partners');
@@ -95,11 +85,11 @@ export default function AddMedicineDetails() {
           return;
         }
 
-        // const foundWellnessPartner = wellnessDetails[0];
+        const foundWellnessPartner = wellnessDetails[0];
+        console.log('====>', foundWellnessPartner);
+
         const medicineDetailsResponseData = await medicineDetails.create(
-          (record: Model) => {
-            const medicineDetailsValues =
-              record as unknown as MedicineDetailsProps;
+          medicineDetailsValues => {
             medicineDetailsValues.additionalNote = additionalNote;
             medicineDetailsValues.doseDetails = doseDetails;
             medicineDetailsValues.medicineDuration = parseInt(
@@ -113,24 +103,19 @@ export default function AddMedicineDetails() {
               10,
             );
 
-            // medicineDetailsValues.wellnessPartner.set(foundWellnessPartner);
+            medicineDetailsValues.wellnessPartner.set(foundWellnessPartner);
           },
         );
 
         if (medicineDetailsResponseData) {
           Object.entries(dayTimeValues).forEach(async ([timeOfDays, times]) => {
-            console.log('times====>', timeOfDays, times);
-
-            await medicineTimingDetails.create((record: Model) => {
-              const medicineTimingDetailsValues =
-                record as unknown as MedicineTimingProps;
-
+            await medicineTimingDetails.create(medicineTimingDetailsValues => {
               medicineTimingDetailsValues.time = times || '';
               medicineTimingDetailsValues.timeOfDay = timeOfDays;
 
-              //   medicineTimingDetailsValues.medicine.set(
-              //     medicineDetailsResponseData,
-              //   );
+              medicineTimingDetailsValues.medicine.set(
+                medicineDetailsResponseData,
+              );
             });
           });
         }
@@ -141,21 +126,37 @@ export default function AddMedicineDetails() {
       console.error('Error adding wellness partner:', error);
     }
   };
+  const deleteTableDetails = async () => {
+    try {
+      const wellnessPartnerCollection = database.get('medicine_timings');
 
+      const allPartners = await wellnessPartnerCollection.query().fetch();
+      await database.write(async () => {
+        const deletions = allPartners.map(partner =>
+          partner.prepareDestroyPermanently(),
+        );
+
+        await database.batch(...deletions);
+        console.log('All wellness partners deleted successfully');
+      });
+    } catch (error) {
+      console.error('Error deleting wellness partners:', error);
+    }
+  };
   const getMedicineDetails = async () => {
-    const wellnessPartnerCollection = await database.get('medicines_details');
+    const wellnessPartnerCollection = await database.get('medicine_timings');
     const partners = await wellnessPartnerCollection.query().fetch();
     const formattedPartners = partners.map((partner: any) => partner._raw);
 
     console.log('mnedicine details==>', formattedPartners);
   };
-  const getMedicineTiming = async () => {
-    const wellnessPartnerCollection = await database.get('medicine_timings');
-    const partners = await wellnessPartnerCollection.query().fetch();
-    const formattedPartners = partners.map((partner: any) => partner._raw);
+  // const getMedicineTiming = async () => {
+  //   const wellnessPartnerCollection = await database.get('medicine_timings');
+  //   const partners = await wellnessPartnerCollection.query().fetch();
+  //   const formattedPartners = partners.map((partner: any) => partner._raw);
 
-    console.log('time details==>', formattedPartners);
-  };
+  //   console.log('time details==>', formattedPartners);
+  // };
 
   const handleSelectTimeOfDay = (value: DayTimeValues) => {
     setForm(prevForm => {
@@ -190,14 +191,14 @@ export default function AddMedicineDetails() {
       dayTimeValues: sanitizedTimeInputs,
     };
   };
-  const handleInputChange = (field: keyof FormState, value: string) => {
+  const handleInputChange = (field: keyof MedicineFormState, value: string) => {
     setForm({...form, [field]: value});
   };
 
   const handleTimeInputChange = (timeOfDay: DayTimeValues, value: string) => {
     if (value.length <= 5) {
       if (value.length === 2 && !value.includes(':')) {
-        value = value + ':'; // Ensure the time has the correct format (hh:mm)
+        value = value + ':';
       }
       if (value.length > 2 && !value.includes(':') && value.length === 3) {
         value = value.slice(0, 2) + ':' + value.slice(2);
@@ -217,7 +218,7 @@ export default function AddMedicineDetails() {
     timeOfDay: DayTimeValues,
     format: 'AM' | 'PM',
   ) => {
-    const time = (form.dayTimeValues[timeOfDay] || '').split(' ')[0]; // Safeguard against undefined
+    const time = (form.dayTimeValues[timeOfDay] || '').split(' ')[0];
     setForm(prevForm => ({
       ...prevForm,
       dayTimeValues: {
@@ -245,53 +246,45 @@ export default function AddMedicineDetails() {
     <ScrollView style={styles.container}>
       <Text style={styles.label}>Medicine Name</Text>
       <TextInput
-        style={styles.input}
         value={form.name}
         onChangeText={value => handleInputChange('name', value)}
-        placeholder="Enter medicine name"
+        placeHolder="Enter medicine name"
       />
 
       <Text style={styles.label}>Dose Details</Text>
       <TextInput
-        style={styles.input}
         value={form.doseDetails}
         onChangeText={value => handleInputChange('doseDetails', value)}
-        placeholder="Enter dose details"
+        placeHolder="Enter dose details"
       />
 
       <Text style={styles.label}>Medicine Type</Text>
       <TextInput
-        style={styles.input}
         value={form.medicineType}
         onChangeText={value => handleInputChange('medicineType', value)}
-        placeholder="Enter medicine type"
+        placeHolder="Enter medicine type"
       />
 
       <Text style={styles.label}>Medicine Duration (in days)</Text>
       <TextInput
-        style={styles.input}
         value={form.medicineDuration}
         onChangeText={value => handleInputChange('medicineDuration', value)}
-        placeholder="Enter duration in days"
-        keyboardType="numeric"
+        placeHolder="Enter duration in days"
       />
 
       <Text style={styles.label}>Additional Note</Text>
       <TextInput
-        style={styles.input}
         value={form.additionalNote}
         onChangeText={value => handleInputChange('additionalNote', value)}
-        placeholder="Enter additional note (optional)"
+        placeHolder="Enter additional note (optional)"
       />
       <Text style={styles.label}>Remaining Number of Medicine</Text>
       <TextInput
-        style={styles.input}
         value={form.remainingNumberOfMedicine}
         onChangeText={value =>
           handleInputChange('remainingNumberOfMedicine', value)
         }
-        placeholder="Enter remaining number (optional)"
-        keyboardType="numeric"
+        placeHolder="Enter remaining number (optional)"
       />
       <Text style={styles.label}>Time of Day</Text>
       {dayTimes.map(time => (
@@ -312,8 +305,8 @@ export default function AddMedicineDetails() {
           </TouchableOpacity>
           {form.timeOfDay.includes(time) && (
             <>
-              <View style={{width: '30%'}}>
-                <TextInput
+              <View style={styles.test}>
+                <RnTextInput
                   style={styles.input}
                   value={(form.dayTimeValues[time] || '').split(' ')[0]}
                   onChangeText={value => handleTimeInputChange(time, value)}
@@ -321,6 +314,11 @@ export default function AddMedicineDetails() {
                   keyboardType="numeric"
                   maxLength={5}
                 />
+                {/* <TextInput
+                  value={(form.dayTimeValues[time] || '').split(' ')[0]}
+                  onChangeText={value => handleTimeInputChange(time, value)}
+                  placeHolder="hh:mm"
+                /> */}
               </View>
               <View style={styles.formatContainer}>
                 <TouchableOpacity
@@ -347,100 +345,12 @@ export default function AddMedicineDetails() {
           )}
         </View>
       ))}
-      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+      <TouchableOpacity
+        style={styles.submitButton}
+        onPress={getMedicineDetails}>
         <Text style={styles.submitButtonText}>Add Medicine</Text>
       </TouchableOpacity>
-      <Button title="add medicindetails" onPress={addMedicinDetails} />
-      <Button title="get meidicne details" onPress={getMedicineDetails} />
-      <Button title="getTimingDetails" onPress={getMedicineTiming} />
+      <Button title="add medicindetails" onPress={getMedicineDetails} />
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#f9f9f9',
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginVertical: 8,
-    color: '#333',
-    alignSelf: 'flex-start',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    marginBottom: 15,
-    backgroundColor: '#fff',
-    width: '100%',
-  },
-  timeOfDayRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  timeButton: {
-    marginRight: 10,
-    borderRadius: 5,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  selectedTimeButton: {
-    backgroundColor: '#007BFF',
-    borderColor: '#007BFF',
-  },
-  timeText: {
-    fontSize: 16,
-    color: '#333',
-  },
-  selectedTimeText: {
-    color: '#fff',
-  },
-  formatContainer: {
-    flexDirection: 'row',
-    marginLeft: 10,
-    alignItems: 'center',
-  },
-  formatButton: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    marginHorizontal: 5,
-  },
-  selectedFormatButton: {
-    backgroundColor: '#007BFF',
-    borderColor: '#007BFF',
-  },
-  formatText: {
-    color: '#333',
-  },
-  submitButton: {
-    backgroundColor: '#007BFF',
-    paddingVertical: 12,
-    borderRadius: 8,
-    marginTop: 20,
-    alignItems: 'center',
-  },
-  submitButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 20,
-  },
-});

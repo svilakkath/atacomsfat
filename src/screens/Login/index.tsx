@@ -1,11 +1,7 @@
+import {TextInput} from '@/components';
 import React, {useState} from 'react';
-import {
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {Text, TouchableOpacity, View} from 'react-native';
+import useStyles from './styles';
 
 type LoginProps = {
   emailAddress: string;
@@ -17,6 +13,7 @@ const Login = () => {
     emailAddress: '',
     password: '',
   });
+  const styles = useStyles();
 
   const handleChange = (field: keyof LoginProps, value: string) => {
     setForm({...form, [field]: value});
@@ -32,17 +29,14 @@ const Login = () => {
       <Text style={styles.title}>Login</Text>
       <View style={styles.form}>
         <TextInput
-          style={styles.input}
-          placeholder="Username"
           value={form.emailAddress}
           onChangeText={value => handleChange('emailAddress', value)}
+          placeHolder="Username"
         />
         <TextInput
-          style={styles.input}
-          placeholder="Password"
-          secureTextEntry
           value={form.password}
           onChangeText={value => handleChange('password', value)}
+          placeHolder="Password"
         />
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>Login</Text>
@@ -51,47 +45,5 @@ const Login = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
-    padding: 16,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 32,
-  },
-  form: {
-    width: '100%',
-    alignItems: 'center',
-  },
-  input: {
-    width: '100%',
-    height: 50,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    marginBottom: 16,
-    backgroundColor: '#fff',
-  },
-  button: {
-    width: '100%',
-    height: 50,
-    backgroundColor: '#007bff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 8,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-});
 
 export default Login;

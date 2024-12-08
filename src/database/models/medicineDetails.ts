@@ -1,9 +1,18 @@
 import {Model} from '@nozbe/watermelondb';
 import {field, readonly, relation} from '@nozbe/watermelondb/decorators';
-import WellnessPartner from './WellnessPartner'; // Import the WellnessPartner model
+import WellnessPartner from './WellnessPartner';
 
+// export type MedicineDetailsProps = {
+//   name: string;
+//   doseDetails: string;
+//   medicineType?: string;
+//   medicineDuration?: number;
+//   additionalNote?: string;
+//   remainingNumberOfMedicine?: number;
+//   wellnessPartner: WellnessPartner;
+// };
 export default class MedicineDetails extends Model {
-  static table = 'medicines_details'; // Table name
+  static table = 'medicines_details';
 
   @field('name') name!: string;
   @field('dose_details') doseDetails!: string;
