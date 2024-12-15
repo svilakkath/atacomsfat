@@ -1,3 +1,4 @@
+import {WellnessPartnerProps} from '@/screens/WellnessPartnerList';
 import {MD3TypescaleKey} from 'react-native-paper';
 
 export type CustomTextType =
@@ -43,6 +44,7 @@ export type RootStackParamList = {
   BottomNavigator: undefined;
   AddWellnessPartner: undefined;
   AddMedicineDetails: undefined;
-  WellnessPartnerHome: undefined;
+  WellnessPartnerHome: {wellnessPartner: WellnessPartnerProps};
   WellnessPartnerList: undefined;
+  MedicineDetailsHome: {wellnessPartnerId: string};
 };

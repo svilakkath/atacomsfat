@@ -5,6 +5,7 @@ import React, {useEffect, useState} from 'react';
 import AddMedicineDetails from '@/screens/AddMedicineDetails';
 import AddWellnessPartner from '@/screens/AddWellnessPartner';
 import Login from '@/screens/Login';
+import MedicineDetailsHome from '@/screens/MedicineDetailsHome';
 import SignUp from '@/screens/SignUp';
 import WellnessPartnerHome from '@/screens/WellnessPartnerHome';
 import WellnessPartnerList from '@/screens/WellnessPartnerList';
@@ -74,6 +75,11 @@ export default function AppNavigator() {
       <Stack.Screen
         name="SignUp"
         component={SignUp}
+        // options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="MedicineDetailsHome"
+        component={MedicineDetailsHome}
         // options={{headerShown: false}}
       />
     </Stack.Navigator>
