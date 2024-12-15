@@ -34,3 +34,15 @@ export type LoginError =
   | '';
 export type IconTypes = 'password' | 'close' | 'magnify';
 export type DayTimeValues = 'Morning' | 'Afternoon' | 'Evening' | 'Night';
+
+export type RootStackParamList = {
+  Home: undefined;
+  Settings: undefined;
+  Login: undefined;
+  SignUp: undefined;
+  BottomNavigator: undefined;
+  AddWellnessPartner: undefined;
+  AddMedicineDetails: undefined;
+  WellnessPartnerHome: undefined;
+  WellnessPartnerList: undefined;
+};

@@ -1,6 +1,9 @@
+import {useAppTheme} from '@/assets/theme';
+import {scale, verticalScale} from '@/utils/scaling/scalingUtil';
 import {StyleSheet} from 'react-native';
 
 const useStyles = () => {
+  const {spacing} = useAppTheme();
   return StyleSheet.create({
     container: {
       flex: 1,
@@ -10,21 +13,21 @@ const useStyles = () => {
     label: {
       fontSize: 16,
       fontWeight: 'bold',
-      marginVertical: 8,
+      marginVertical: verticalScale(spacing.s_8),
       color: '#333',
     },
     input: {
-      borderWidth: 1,
+      borderWidth: scale(1),
       borderColor: '#ccc',
       borderRadius: 5,
-      padding: 10,
+      padding: scale(10),
       fontSize: 16,
-      marginBottom: 15,
+      marginBottom: verticalScale(spacing.s_16),
     },
     button: {
       backgroundColor: '#007BFF',
       borderRadius: 5,
-      padding: 10,
+      padding: scale(10),
       alignItems: 'center',
     },
     buttonText: {

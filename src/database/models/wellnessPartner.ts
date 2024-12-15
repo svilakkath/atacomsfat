@@ -5,7 +5,7 @@ import User from './User';
 // export type WellnessPartnerProps = {
 //   fullName: string;
 //   phoneNumber: string;
-//   age: number;
+//   age: string;
 //   gender: string;
 //   profileImage?: string;
 //   user: User;
@@ -21,4 +21,5 @@ export default class WellnessPartner extends Model {
   @readonly @field('created_at') createdAt!: number;
   @readonly @field('updated_at') updatedAt!: number;
   @relation('users', 'user_id') user!: User; // Foreign key to User table
+  set: any;
 }

@@ -1,15 +1,46 @@
 import {TextInput} from '@/components';
-import {database} from '@/database/database';
-import WellnessPartner from '@/database/models/WellnessPartner';
-import {Q} from '@nozbe/watermelondb';
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {Button, ScrollView, Text} from 'react-native';
 import useStyles from './styles';
 
+type ValidationRule = {
+  required: boolean;
+  validate?: (value: string) => boolean;
+  message: string;
+};
+type ValidationRules = Record<string, ValidationRule>;
+
+const validationRules: ValidationRules = {
+  fullName: {
+    required: true,
+    message: 'Full Name is required.',
+  },
+  phoneNumber: {
+    required: true,
+    validate: (value: string) => /^\d{10}$/.test(value),
+    message: 'Phone Number must be 10 digits.',
+  },
+  age: {
+    required: true,
+    validate: (value: string) => /^\d+$/.test(value) && parseInt(value, 10) > 0,
+    message: 'Age must be a positive number.',
+  },
+  gender: {
+    required: true,
+    validate: (value: string) =>
+      ['Male', 'Female', 'Other'].includes(value.trim()),
+    message: 'Enter gender details (Male, Female, Other).',
+  },
+  profileImage: {
+    required: false,
+    validate: (value: string) =>
+      !value || /^(https?:\/\/.*\.(?:png|jpg|jpeg|gif))$/i.test(value),
+    message: 'Profile Image must be a valid URL (optional).',
+  },
+};
 export default function AddWellnessPartner() {
-  // const { user } = useAuth();
-  // const userId = '12tsf5saazxcvhbj';
   const styles = useStyles();
+  // const {uid} = useUserStore();
 
   const [form, setForm] = useState({
     fullName: '',
@@ -18,72 +49,42 @@ export default function AddWellnessPartner() {
     gender: '',
     profileImage: '',
   });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const validateForm = useCallback(() => {
+    const newErrors: Record<string, string> = {};
+
+    Object.entries(validationRules).forEach(([field, rule]) => {
+      const value = form[field as keyof typeof form];
+
+      if (rule.required && !value) {
+        newErrors[field] = rule.message;
+      } else if (rule.validate && !rule.validate(value)) {
+        newErrors[field] = rule.message;
+      }
+    });
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }, [form]);
 
   const handleInputChange = (field: string, value: string) => {
     setForm({...form, [field]: value});
+    if (errors[field]) {
+      setErrors({...errors, [field]: ''});
+    }
   };
 
   const handleSubmit = async () => {
-    const {fullName, phoneNumber, age, gender, profileImage} = form;
-
-    try {
-      const wellnessPartnerCollection =
-        database.get<WellnessPartner>('wellness_partners');
-      const userCollection = database.get('users');
-
-      await database.write(async () => {
-        const emailAddress = 'samadu@gmail.com';
-        const users = await userCollection
-          .query(Q.where('email_address', emailAddress))
-          .fetch();
-
-        if (users.length === 0) {
-          console.error('No user found with the provided userAuthId');
-          return;
-        }
-        // const foundUser = users[0];
-
-        await wellnessPartnerCollection.create(wellnessPartner => {
-          // const wellnessPartner = record as unknown as WellnessPartnerProps;
-          wellnessPartner.fullName = fullName;
-          wellnessPartner.phoneNumber = phoneNumber;
-          wellnessPartner.age = parseInt(age, 10);
-          wellnessPartner.gender = gender;
-          wellnessPartner.profileImage = profileImage || undefined;
-
-          // wellnessPartner.user.set(foundUser);
-        });
-
-        console.log('Wellness Partner added successfully');
-      });
-    } catch (error) {
-      console.error('Error adding wellness partner:', error);
+    validateForm();
+    if (!validateForm()) {
+      console.log(
+        'Validation Error',
+        'Please fix the errors before submitting.',
+      );
+      return;
     }
-  };
-
-  const deleteTableDetails = async () => {
-    try {
-      const wellnessPartnerCollection = database.get('medicine_timings');
-
-      const allPartners = await wellnessPartnerCollection.query().fetch();
-      await database.write(async () => {
-        const deletions = allPartners.map(partner =>
-          partner.prepareDestroyPermanently(),
-        );
-
-        await database.batch(...deletions);
-        console.log('All wellness partners deleted successfully');
-      });
-    } catch (error) {
-      console.error('Error deleting wellness partners:', error);
-    }
-  };
-
-  const getWellnessPartnersDetails = async () => {
-    const wellnessPartnerCollection = await database.get('medicine_timings');
-    const partners = await wellnessPartnerCollection.query().fetch();
-    const formattedPartners = partners.map((partner: any) => partner._raw);
-    console.log('wellness partners ==>', formattedPartners);
+    // await wellnessPartnerService.createWellnessPartner(form, uid);
   };
 
   return (
@@ -94,6 +95,7 @@ export default function AddWellnessPartner() {
         onChangeText={value => handleInputChange('fullName', value)}
         placeHolder="Enter full name"
       />
+      {errors.fullName && <Text style={{color: 'red'}}>{errors.fullName}</Text>}
 
       <Text style={styles.label}>Phone Number</Text>
       <TextInput
@@ -123,11 +125,8 @@ export default function AddWellnessPartner() {
       />
 
       <Button title="add wellness partner" onPress={handleSubmit} />
-      <Button
-        title="get wellness partner"
-        onPress={getWellnessPartnersDetails}
-      />
-      <Button title="delete" onPress={deleteTableDetails} />
+      <Button title="get wellness partner" onPress={() => {}} />
+      <Button title="delete" onPress={() => {}} />
     </ScrollView>
   );
 }

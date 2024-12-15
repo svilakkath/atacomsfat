@@ -17,7 +17,7 @@ export default class MedicineDetails extends Model {
   @field('name') name!: string;
   @field('dose_details') doseDetails!: string;
   @field('medicine_type') medicineType: string | undefined;
-  @field('medicine_duration') medicineDuration: number | undefined; // Duration in days
+  @field('medicine_duration') medicineDuration: number | undefined;
   @field('additional_note') additionalNote: string | undefined;
   @field('remaining_number_of_medicine') remainingNumberOfMedicine:
     | number
@@ -27,4 +27,5 @@ export default class MedicineDetails extends Model {
 
   @relation('wellness_partners', 'wellness_partner_id')
   wellnessPartner!: WellnessPartner; // Foreign key to WellnessPartner
+  set: any;
 }

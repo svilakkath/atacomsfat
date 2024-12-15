@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "687811925987",
+    "project_id": "atacomsfat",
+    "storage_bucket": "atacomsfat.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:687811925987:android:031813ccefbb684181f2d6",
+        "android_client_info": {
+          "package_name": "com.awesomeproject"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB8Lhszol2-Y0ODWCc2mQzEJk433lb1gb4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

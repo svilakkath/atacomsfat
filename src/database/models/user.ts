@@ -20,4 +20,5 @@ export default class User extends Model {
   @field('user_auth_id') userAuthId!: string; // unique, not null
   @readonly @field('created_at') createdAt!: number;
   @readonly @field('updated_at') updatedAt!: number;
+  set: any;
 }

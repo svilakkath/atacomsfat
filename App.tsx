@@ -1,4 +1,4 @@
-import AppNavigator from '@/navigations';
+import AppNavigator from '@/navigations/AppNavigator';
 import {NavigationContainer} from '@react-navigation/native';
 import React from 'react';
 

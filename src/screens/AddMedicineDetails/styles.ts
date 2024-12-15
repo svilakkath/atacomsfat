@@ -1,40 +1,47 @@
+import {useAppTheme} from '@/assets/theme';
+import {scale, verticalScale} from '@/utils/scaling/scalingUtil';
 import {StyleSheet} from 'react-native';
 
 const useStyles = () => {
+  const {spacing} = useAppTheme();
+
   return StyleSheet.create({
-    container: {
-      flex: 1,
-      padding: 20,
-      backgroundColor: '#f9f9f9',
-    },
     label: {
       fontSize: 16,
       fontWeight: 'bold',
-      marginVertical: 8,
+      marginVertical: verticalScale(spacing.s_8),
       color: '#333',
       alignSelf: 'flex-start',
     },
+    firstScreen: {
+      width: '100%',
+      height: '100%',
+    },
+    secondScreen: {
+      width: '100%',
+      height: '100%',
+    },
     input: {
-      borderWidth: 1,
+      borderWidth: scale(1),
       borderColor: '#ccc',
       borderRadius: 8,
-      padding: 12,
+      padding: scale(spacing.s_8),
       fontSize: 16,
-      marginBottom: 15,
+      marginBottom: verticalScale(spacing.s_16),
       backgroundColor: '#fff',
       width: '100%',
     },
     timeOfDayRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginBottom: 15,
+      marginBottom: verticalScale(spacing.s_16),
     },
     timeButton: {
-      marginRight: 10,
+      marginRight: scale(spacing.s_12),
       borderRadius: 5,
-      paddingVertical: 8,
-      paddingHorizontal: 16,
-      borderWidth: 1,
+      paddingVertical: verticalScale(spacing.s_8),
+      paddingHorizontal: scale(spacing.s_16),
+      borderWidth: scale(1),
       borderColor: '#ccc',
       alignItems: 'center',
       justifyContent: 'center',
@@ -52,15 +59,15 @@ const useStyles = () => {
     },
     formatContainer: {
       flexDirection: 'row',
-      marginLeft: 10,
+      marginLeft: scale(spacing.s_12),
       alignItems: 'center',
     },
     formatButton: {
-      borderWidth: 1,
+      borderWidth: scale(1),
       borderColor: '#ccc',
       borderRadius: 5,
-      paddingVertical: 5,
-      paddingHorizontal: 10,
+      paddingVertical: verticalScale(spacing.s_4),
+      paddingHorizontal: scale(spacing.s_12),
       marginHorizontal: 5,
     },
     selectedFormatButton: {
@@ -72,9 +79,9 @@ const useStyles = () => {
     },
     submitButton: {
       backgroundColor: '#007BFF',
-      paddingVertical: 12,
+      paddingVertical: verticalScale(spacing.s_12),
       borderRadius: 8,
-      marginTop: 20,
+      marginTop: verticalScale(spacing.s_12),
       alignItems: 'center',
     },
     submitButtonText: {
@@ -85,10 +92,18 @@ const useStyles = () => {
     buttonContainer: {
       flexDirection: 'row',
       justifyContent: 'space-around',
-      marginTop: 20,
+      marginTop: verticalScale(spacing.s_20),
     },
     test: {
       width: '30%',
+    },
+    errorText: {
+      color: 'red',
+    },
+    container: {
+      flex: 1,
+      backgroundColor: '#fff',
+      justifyContent: 'center',
     },
   });
 };

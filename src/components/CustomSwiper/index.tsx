@@ -7,11 +7,21 @@ const {width} = Dimensions.get('window');
 type SwiperProps = {
   children: React.ReactNode; // Pages passed as children
   onPageChanged?: (pageIndex: number) => void;
+  isScrollable?: boolean;
+  viewPagination?: boolean;
 };
 
 // Wrapping the function component with forwardRef
 const CustomSwiper = forwardRef(
-  ({children, onPageChanged}: SwiperProps, ref: any) => {
+  (
+    {
+      children,
+      onPageChanged,
+      isScrollable = true,
+      viewPagination = false,
+    }: SwiperProps,
+    ref: any,
+  ) => {
     const scrollViewRef = useRef<ScrollView | null>(null);
     const [currentPage, setCurrentPage] = useState(0);
     const styles = useStyles();
@@ -65,6 +75,7 @@ const CustomSwiper = forwardRef(
           horizontal
           pagingEnabled
           showsHorizontalScrollIndicator={false}
+          scrollEnabled={isScrollable}
           onScroll={onScroll}
           onMomentumScrollEnd={handlePageChange}
           scrollEventThrottle={16}>
@@ -75,7 +86,7 @@ const CustomSwiper = forwardRef(
           ))}
         </ScrollView>
 
-        {renderPagination()}
+        {viewPagination ? renderPagination() : ''}
       </View>
     );
   },

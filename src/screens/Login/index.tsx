@@ -8,7 +8,7 @@ type LoginProps = {
   password: string;
 };
 
-const Login = () => {
+const Login = ({navigation}) => {
   const [form, setForm] = useState<LoginProps>({
     emailAddress: '',
     password: '',
@@ -27,20 +27,31 @@ const Login = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
-      <View style={styles.form}>
+      <View>
         <TextInput
           value={form.emailAddress}
           onChangeText={value => handleChange('emailAddress', value)}
-          placeHolder="Username"
+          placeHolder="Email Address"
         />
+      </View>
+      <View>
         <TextInput
           value={form.password}
           onChangeText={value => handleChange('password', value)}
           placeHolder="Password"
+          secureTextEntry
         />
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
+      </View>
+      <TouchableOpacity style={styles.button} onPress={handleLogin}>
+        <Text style={styles.buttonText}>Login</Text>
+      </TouchableOpacity>
+      <View>
+        <View style={styles.buttonView}>
+          <Text>Don't have an account? </Text>
+          <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+            <Text style={styles.signUpText}>Sign Up</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
