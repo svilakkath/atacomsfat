@@ -1,9 +1,15 @@
 import {Model} from '@nozbe/watermelondb';
 import {field, readonly, relation} from '@nozbe/watermelondb/decorators';
-import MedicineDetails from './MedicineDetails'; // Import the MedicineDetails model
+import MedicineDetails from './MedicineDetails';
+
+// export type MedicineTimingProps = {
+//   timeOfDay: string;
+//   time: string;
+//   medicine: MedicineDetails;
+// };
 
 export default class MedicineTiming extends Model {
-  static table = 'medicine_timings'; // Table name
+  static table = 'medicine_timings';
 
   @field('time_of_day') timeOfDay!: string; // e.g., Morning, Evening
   @field('time') time!: string; // e.g., 9:00 AM

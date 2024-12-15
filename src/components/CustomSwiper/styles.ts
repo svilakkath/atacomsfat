@@ -1,35 +1,37 @@
 import {Dimensions, StyleSheet} from 'react-native';
 
-const useStyles = () => {
-  const {width} = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
 
-  return StyleSheet.create({
+const useStyles = () =>
+  StyleSheet.create({
     container: {
       flex: 1,
     },
     page: {
-      width, // Each page takes full screen width
-      flex: 1,
-    },
-    pagination: {
-      flexDirection: 'row',
+      width, // Match the device width for each page
+      height, // Match the device height to prevent overlapping
       justifyContent: 'center',
-      position: 'absolute',
-      bottom: 20,
-      width: '100%',
+      alignItems: 'center',
     },
     dot: {
       width: 8,
       height: 8,
       borderRadius: 4,
-      marginHorizontal: 5,
+      marginHorizontal: 4,
+      backgroundColor: '#ccc',
     },
     activeDot: {
-      backgroundColor: '#000',
+      backgroundColor: '#007bff',
     },
     inactiveDot: {
       backgroundColor: '#ccc',
     },
+    pagination: {
+      position: 'absolute',
+      bottom: 20,
+      flexDirection: 'row',
+      alignSelf: 'center',
+    },
   });
-};
+
 export default useStyles;
