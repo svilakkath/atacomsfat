@@ -4,16 +4,16 @@ import {Button, Image, View} from 'react-native';
 import useStyles from './styles';
 
 type UserCardProps = {
-  name: string;
-  gender: string;
+  mainText: string;
+  subText: string;
   imageUrl?: string;
   buttonTitle: string;
   onButtonPress: () => void;
 };
 
-const CustomUserCard = ({
-  name,
-  gender,
+const CustomCard = ({
+  mainText,
+  subText,
   imageUrl,
   buttonTitle,
   onButtonPress,
@@ -29,12 +29,12 @@ const CustomUserCard = ({
         resizeMode="cover"
       />
       <View style={styles.detailsContainer}>
-        <Text title={name} variant="displaySmall" color="primary" />
-        <Text title={gender} variant="baseFont" color="primary" />
+        <Text title={mainText} variant="displaySmall" color="primary" />
+        <Text title={subText} variant="baseFont" color="primary" />
       </View>
       <Button title={buttonTitle} onPress={onButtonPress} />
     </View>
   );
 };
 
-export default CustomUserCard;
+export default CustomCard;

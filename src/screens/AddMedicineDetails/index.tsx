@@ -1,4 +1,5 @@
 import {Swiper, TextInput} from '@/components';
+import {useUserStore} from '@/store';
 import React, {useCallback, useRef, useState} from 'react';
 import {
   Button,
@@ -7,11 +8,12 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import medicineDetailsService from './services';
 import useStyles from './styles';
 
 export type DayTimeValues = 'Morning' | 'Afternoon' | 'Evening' | 'Night';
 
-type MedicineFormState = {
+type AddMedicineDetailsProps = {
   name: string;
   doseDetails: string;
   medicineType: string;
@@ -22,14 +24,17 @@ type MedicineFormState = {
   dayTimeValues: Record<string, string>;
 };
 
-type ValidationRule = {
+type AddMedicineDetailsValidationProps = {
   required?: boolean;
   validate?: (value: string) => boolean;
   message?: string;
 };
 
-type ErrorProps = Partial<Record<keyof MedicineFormState, string>>;
-const validationRules: Record<keyof MedicineFormState, ValidationRule> = {
+type ErrorProps = Partial<Record<keyof AddMedicineDetailsProps, string>>;
+const validationRules: Record<
+  keyof AddMedicineDetailsProps,
+  AddMedicineDetailsValidationProps
+> = {
   name: {
     required: true,
     message: 'Medicine name is required.',
@@ -76,7 +81,7 @@ export default function AddMedicineDetails() {
   const swiperRef = useRef<any>(null);
   const [currentPage, setCurrentPage] = useState(0);
 
-  const [form, setForm] = useState<MedicineFormState>({
+  const [form, setForm] = useState<AddMedicineDetailsProps>({
     name: '',
     doseDetails: '',
     medicineType: '',
@@ -88,15 +93,15 @@ export default function AddMedicineDetails() {
   });
   const [errors, setErrors] = useState<ErrorProps>({});
   const [submit, setSubmit] = useState(false);
-  // const {uid} = useUserStore();
+  const {uid} = useUserStore();
 
   const addMedicinDetails = async () => {
     sanitizeForm();
-    // await medicineDetailsService.addMedicineDetails(form, uid);
+    await medicineDetailsService.addMedicineDetails(form, uid);
   };
-  const onSubmit = () => {
-    setSubmit(true);
-  };
+  // const onSubmit = () => {
+  //   setSubmit(true);
+  // };
 
   const handleSelectTimeOfDay = (value: DayTimeValues) => {
     setForm(prevForm => {
@@ -138,7 +143,10 @@ export default function AddMedicineDetails() {
     };
   };
 
-  const handleInputChange = (field: keyof MedicineFormState, value: string) => {
+  const handleInputChange = (
+    field: keyof AddMedicineDetailsProps,
+    value: string,
+  ) => {
     setForm(prevForm => ({...prevForm, [field]: value}));
 
     // Clear error when input is valid
@@ -193,11 +201,11 @@ export default function AddMedicineDetails() {
       ['name', 'doseDetails', 'medicineType', 'medicineDuration'].forEach(
         field => {
           if (
-            validationRules[field as keyof MedicineFormState].required &&
-            !form[field as keyof MedicineFormState]
+            validationRules[field as keyof AddMedicineDetailsProps].required &&
+            !form[field as keyof AddMedicineDetailsProps]
           ) {
-            newErrors[field as keyof MedicineFormState] =
-              validationRules[field as keyof MedicineFormState].message ||
+            newErrors[field as keyof AddMedicineDetailsProps] =
+              validationRules[field as keyof AddMedicineDetailsProps].message ||
               'Required.';
           }
         },
@@ -205,17 +213,19 @@ export default function AddMedicineDetails() {
     } else if (currentPage === 1) {
       ['additionalNote', 'remainingNumberOfMedicine', 'timeOfDay'].forEach(
         field => {
-          if (validationRules[field as keyof MedicineFormState].required) {
-            const value = form[field as keyof MedicineFormState];
+          if (
+            validationRules[field as keyof AddMedicineDetailsProps].required
+          ) {
+            const value = form[field as keyof AddMedicineDetailsProps];
             if (
               (field === 'timeOfDay' &&
                 Array.isArray(value) &&
                 value.length === 0) || // Check for empty array
               (!Array.isArray(value) && !value) // General check for falsy values
             ) {
-              newErrors[field as keyof MedicineFormState] =
-                validationRules[field as keyof MedicineFormState].message ||
-                'Required.';
+              newErrors[field as keyof AddMedicineDetailsProps] =
+                validationRules[field as keyof AddMedicineDetailsProps]
+                  .message || 'Required.';
             }
           }
         },
@@ -254,7 +264,7 @@ export default function AddMedicineDetails() {
     if (!isValid) {
       return;
     }
-    // addMedicinDetails();
+    addMedicinDetails();
   };
   // const handleDelete = () => {
   //   medicineDetailsService.deleteAllMedicineDetails();

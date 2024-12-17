@@ -1,16 +1,10 @@
 import {database} from '@/database/database';
 import User from '@/database/models/User';
+import {UserSignupProps} from '@/screens/types';
 import {hashPassword} from '@/utils/helper';
 
-type UserDetailsProps = {
-  fullName: string;
-  emailAddress: string;
-  password: string;
-  phoneNumber: string;
-};
-
 const userService = {
-  createUser: async (form: UserDetailsProps, uid: string) => {
+  createUser: async (form: UserSignupProps, uid: string) => {
     const {fullName, phoneNumber, emailAddress} = form;
     const hashedPassword = await hashPassword(form.password);
 

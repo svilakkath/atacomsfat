@@ -1,14 +1,40 @@
+import {RootStackParamList} from '@/types/common';
+import {NavigationProp, RouteProp, useRoute} from '@react-navigation/native';
 import React from 'react';
 import {FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {ModulesProps} from '../types';
 
-const WellnessPartnerHome = () => {
+type WellnessPartnerHomeRouteProp = RouteProp<
+  RootStackParamList,
+  'WellnessPartnerHome'
+>;
+
+type WellnessHomeProps = {
+  navigation: NavigationProp<RootStackParamList, 'MedicineDetailsHome'>;
+};
+const WellnessPartnerHome = ({navigation}: WellnessHomeProps) => {
+  const route = useRoute<WellnessPartnerHomeRouteProp>();
+  const {wellnessPartner} = route.params;
+
+  const wellnessPartnerId = wellnessPartner.id;
+
   const data = [
     {id: 0, title: 'Medicines'},
     {id: 1, title: 'Profile'},
   ];
+  const handlePress = (item: ModulesProps) => {
+    switch (item.title) {
+      case 'Medicines':
+        navigation.navigate('MedicineDetailsHome', {wellnessPartnerId});
+        break;
+      case 'Profile':
+        navigation.navigate('WellnessPartnerProfile', {wellnessPartnerId});
+        break;
+    }
+  };
 
   const renderCard = ({item}: any) => (
-    <TouchableOpacity style={styles.card}>
+    <TouchableOpacity style={styles.card} onPress={() => handlePress(item)}>
       <View style={styles.imageContainer}>
         <Text style={styles.imagePlaceholder}>Image Icon</Text>
       </View>

@@ -2,14 +2,6 @@ import {Model} from '@nozbe/watermelondb';
 import {field, readonly, relation} from '@nozbe/watermelondb/decorators';
 import User from './User';
 
-// export type WellnessPartnerProps = {
-//   fullName: string;
-//   phoneNumber: string;
-//   age: string;
-//   gender: string;
-//   profileImage?: string;
-//   user: User;
-// };
 export default class WellnessPartner extends Model {
   static table = 'wellness_partners';
 
