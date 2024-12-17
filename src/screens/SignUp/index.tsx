@@ -6,22 +6,12 @@ import auth from '@react-native-firebase/auth';
 import {NavigationProp} from '@react-navigation/native';
 import React, {useCallback, useRef, useState} from 'react';
 import {Button, Text, TouchableOpacity, View} from 'react-native';
+import {UserSignupProps, ValidationRules} from '../types';
 import userService from './services';
 import useStyles from './styles';
 
-type SignUpProps = {
-  fullName: string;
-  phoneNumber: string;
-  emailAddress: string;
-  password: string;
-};
-type ValidationRule = {
-  required?: boolean;
-  validate?: (value: string) => boolean;
-  message?: string;
-};
-type ErrorProps = Partial<Record<keyof SignUpProps, string>>;
-const validationRules: Record<keyof SignUpProps, ValidationRule> = {
+type ErrorProps = Partial<Record<keyof UserSignupProps, string>>;
+const validationRules: Record<keyof UserSignupProps, ValidationRules> = {
   fullName: {
     required: true,
     message: 'Enter full name.',
@@ -50,7 +40,7 @@ const SignUp = ({navigation}: LoginProps) => {
 
   const styles = useStyles();
 
-  const [form, setForm] = useState<SignUpProps>({
+  const [form, setForm] = useState<UserSignupProps>({
     fullName: '',
     phoneNumber: '',
     emailAddress: '',
@@ -84,21 +74,23 @@ const SignUp = ({navigation}: LoginProps) => {
     if (currentPage === 0) {
       ['fullName', 'phoneNumber'].forEach(field => {
         if (
-          validationRules[field as keyof SignUpProps].required &&
-          !form[field as keyof SignUpProps]
+          validationRules[field as keyof UserSignupProps].required &&
+          !form[field as keyof UserSignupProps]
         ) {
-          newErrors[field as keyof SignUpProps] =
-            validationRules[field as keyof SignUpProps].message || 'Required.';
+          newErrors[field as keyof UserSignupProps] =
+            validationRules[field as keyof UserSignupProps].message ||
+            'Required.';
         }
       });
     } else if (currentPage === 1) {
       ['emailAddress', 'password'].forEach(field => {
         if (
-          validationRules[field as keyof SignUpProps].required &&
-          !form[field as keyof SignUpProps]
+          validationRules[field as keyof UserSignupProps].required &&
+          !form[field as keyof UserSignupProps]
         ) {
-          newErrors[field as keyof SignUpProps] =
-            validationRules[field as keyof SignUpProps].message || 'Required.';
+          newErrors[field as keyof UserSignupProps] =
+            validationRules[field as keyof UserSignupProps].message ||
+            'Required.';
         }
       });
     }
@@ -136,7 +128,7 @@ const SignUp = ({navigation}: LoginProps) => {
     await userService.createUser(form, uid);
   };
 
-  const handleInputChange = (field: keyof SignUpProps, value: string) => {
+  const handleInputChange = (field: keyof UserSignupProps, value: string) => {
     setForm({...form, [field]: value});
     if (validationRules[field]?.required && value) {
       setErrors(prevErrors => ({...prevErrors, [field]: ''}));

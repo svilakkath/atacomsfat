@@ -9,6 +9,7 @@ import MedicineDetailsHome from '@/screens/MedicineDetailsHome';
 import SignUp from '@/screens/SignUp';
 import WellnessPartnerHome from '@/screens/WellnessPartnerHome';
 import WellnessPartnerList from '@/screens/WellnessPartnerList';
+import WellnessPartnerProfile from '@/screens/WellnessPartnerProfile';
 import {useUserStore} from '@/store';
 import {RootStackParamList} from '@/types/common';
 import BottomTabNavigator from './bottomTabNavigator';
@@ -47,40 +48,25 @@ export default function AppNavigator() {
         component={BottomTabNavigator}
         options={{headerShown: false}}
       />
-      <Stack.Screen
-        name="AddWellnessPartner"
-        component={AddWellnessPartner}
-        // options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="AddMedicineDetails"
-        component={AddMedicineDetails}
-        // options={{headerShown: false}}
-      />
+      <Stack.Screen name="AddWellnessPartner" component={AddWellnessPartner} />
+      <Stack.Screen name="AddMedicineDetails" component={AddMedicineDetails} />
       <Stack.Screen
         name="WellnessPartnerHome"
         component={WellnessPartnerHome}
-        // options={{headerShown: false}}
       />
       <Stack.Screen
         name="WellnessPartnerList"
         component={WellnessPartnerList}
-        // options={{headerShown: false}}
       />
-      <Stack.Screen
-        name="Login"
-        component={Login}
-        // options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="SignUp"
-        component={SignUp}
-        // options={{headerShown: false}}
-      />
+      <Stack.Screen name="Login" component={Login} />
+      <Stack.Screen name="SignUp" component={SignUp} />
       <Stack.Screen
         name="MedicineDetailsHome"
         component={MedicineDetailsHome}
-        // options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="WellnessPartnerProfile"
+        component={WellnessPartnerProfile}
       />
     </Stack.Navigator>
   );

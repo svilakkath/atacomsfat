@@ -11,7 +11,7 @@ export default function BottomTabNavigator() {
   return (
     <Tab.Navigator
       screenOptions={{headerShown: false}}
-      initialRouteName="WellnessPartnerList">
+      initialRouteName="Settings">
       <Tab.Screen name="Home" component={AddWellnessPartner} />
       <Tab.Screen name="WellnessPartnerList" component={WellnessPartnerList} />
       <Tab.Screen name="Settings" component={AddMedicineDetails} />

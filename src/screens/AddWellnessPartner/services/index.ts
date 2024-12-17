@@ -1,19 +1,12 @@
 import {database} from '@/database/database';
 import User from '@/database/models/User';
 import WellnessPartner from '@/database/models/WellnessPartner';
+import {AddWellnessPartnerProps} from '@/screens/types';
 import {Q} from '@nozbe/watermelondb';
-
-type WellnessPartnerProps = {
-  fullName: string;
-  phoneNumber: string;
-  age: string;
-  gender: string;
-  profileImage?: string;
-};
 
 const wellnessPartnerService = {
   createWellnessPartner: async (
-    form: WellnessPartnerProps,
+    form: AddWellnessPartnerProps,
     userAuthId: string | null,
   ) => {
     const {fullName, phoneNumber, age, gender, profileImage} = form;

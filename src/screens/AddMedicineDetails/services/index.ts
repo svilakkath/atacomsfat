@@ -1,22 +1,14 @@
 import {database} from '@/database/database';
 import MedicineDetails from '@/database/models/medicineDetails';
 import MedicineTiming from '@/database/models/medicineTiming';
-import {DayTimeValues} from '@/types/common';
+import {AddMedicineDetailsProps} from '@/screens/types';
 import {Q} from '@nozbe/watermelondb';
 
-type MedicineFormState = {
-  name: string;
-  doseDetails: string;
-  medicineType: string;
-  medicineDuration: string;
-  additionalNote: string;
-  remainingNumberOfMedicine: string;
-  timeOfDay: DayTimeValues[];
-  dayTimeValues: Record<string, string>;
-};
-
 const medicineDetailsService = {
-  addMedicineDetails: async (form: MedicineFormState, uid: string | null) => {
+  addMedicineDetails: async (
+    form: AddMedicineDetailsProps,
+    uid: string | null,
+  ) => {
     const {
       name,
       doseDetails,

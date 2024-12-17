@@ -1,13 +1,6 @@
 import {Model} from '@nozbe/watermelondb';
 import {field, readonly, relation} from '@nozbe/watermelondb/decorators';
 import MedicineDetails from './MedicineDetails';
-
-// export type MedicineTimingProps = {
-//   timeOfDay: string;
-//   time: string;
-//   medicine: MedicineDetails;
-// };
-
 export default class MedicineTiming extends Model {
   static table = 'medicine_timings';
 

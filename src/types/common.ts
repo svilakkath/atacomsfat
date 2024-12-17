@@ -47,4 +47,5 @@ export type RootStackParamList = {
   WellnessPartnerHome: {wellnessPartner: WellnessPartnerProps};
   WellnessPartnerList: undefined;
   MedicineDetailsHome: {wellnessPartnerId: string};
+  WellnessPartnerProfile: {wellnessPartnerId: string};
 };
