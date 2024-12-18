@@ -2,7 +2,7 @@ import {NavigationProp} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {FlatList, StyleSheet, Text, View} from 'react-native';
 
-import {CustomCard} from '@/components';
+import {CustomCard, Header} from '@/components';
 import {useUserStore} from '@/store';
 import {RootStackParamList} from '@/types/common';
 import {AllWellnessPartnersDetailsProps} from '../types';
@@ -56,6 +56,10 @@ const WellnessPartnerList = ({navigation}: WellnessListProps) => {
 
   return (
     <View style={styles.container}>
+      <Header
+        title={'Wellness Partners List'}
+        onBackPress={() => navigation.goBack()}
+      />
       {loading ? (
         <View>
           <Text>Loading...</Text>

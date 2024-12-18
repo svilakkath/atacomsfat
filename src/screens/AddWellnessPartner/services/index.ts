@@ -1,7 +1,7 @@
 import {database} from '@/database/database';
 import User from '@/database/models/User';
 import WellnessPartner from '@/database/models/WellnessPartner';
-import {AddWellnessPartnerProps} from '@/screens/types';
+import {AddWellnessPartnerProps, ValidationRules} from '@/screens/types';
 import {Q} from '@nozbe/watermelondb';
 
 const wellnessPartnerService = {
@@ -71,3 +71,35 @@ const wellnessPartnerService = {
   },
 };
 export default wellnessPartnerService;
+
+export const validationRules: Record<
+  keyof AddWellnessPartnerProps,
+  ValidationRules
+> = {
+  fullName: {
+    required: true,
+    message: '*Required',
+  },
+  phoneNumber: {
+    required: true,
+    validate: (value: string) => /^\d{10}$/.test(value),
+    message: '*Required',
+  },
+  age: {
+    required: true,
+    validate: (value: string) => /^\d+$/.test(value) && parseInt(value, 10) > 0,
+    message: '*Required',
+  },
+  gender: {
+    required: true,
+    validate: (value: string) =>
+      ['Male', 'Female', 'Other'].includes(value.trim()),
+    message: '*Required',
+  },
+  profileImage: {
+    required: false,
+    validate: (value: string) =>
+      !value || /^(https?:\/\/.*\.(?:png|jpg|jpeg|gif))$/i.test(value),
+    message: 'Profile Image must be a valid URL (optional).',
+  },
+};

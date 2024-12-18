@@ -48,25 +48,41 @@ export default function AppNavigator() {
         component={BottomTabNavigator}
         options={{headerShown: false}}
       />
-      <Stack.Screen name="AddWellnessPartner" component={AddWellnessPartner} />
-      <Stack.Screen name="AddMedicineDetails" component={AddMedicineDetails} />
+      <Stack.Screen
+        name="AddWellnessPartner"
+        component={AddWellnessPartner}
+        options={{title: 'Add Wellness Partner'}}
+      />
+      <Stack.Screen
+        name="AddMedicineDetails"
+        component={AddMedicineDetails}
+        options={{title: 'Add Medicine Details'}}
+      />
       <Stack.Screen
         name="WellnessPartnerHome"
         component={WellnessPartnerHome}
+        options={{title: 'Wellness Partners'}}
       />
       <Stack.Screen
         name="WellnessPartnerList"
         component={WellnessPartnerList}
+        options={{title: 'Wellness Partner List'}}
       />
-      <Stack.Screen name="Login" component={Login} />
-      <Stack.Screen name="SignUp" component={SignUp} />
+      <Stack.Screen name="Login" component={Login} options={{title: 'Login'}} />
+      <Stack.Screen
+        name="SignUp"
+        component={SignUp}
+        options={{title: 'Sign Up'}}
+      />
       <Stack.Screen
         name="MedicineDetailsHome"
         component={MedicineDetailsHome}
+        options={{title: 'Medicine Details'}}
       />
       <Stack.Screen
         name="WellnessPartnerProfile"
         component={WellnessPartnerProfile}
+        options={{title: 'Profile'}}
       />
     </Stack.Navigator>
   );

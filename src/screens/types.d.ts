@@ -1,7 +1,7 @@
 export type ValidationRules = {
-  required?: boolean;
+  required: boolean;
   validate?: (value: string) => boolean;
-  message?: string;
+  message: string;
 };
 
 // ====================== Add Medicine Details Screen ====================== //

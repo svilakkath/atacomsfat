@@ -7,12 +7,13 @@ const useStyles = () => {
   return StyleSheet.create({
     container: {
       flex: 1,
-      padding: 20,
-      backgroundColor: '#fff',
+      padding: 18,
+      backgroundColor: '#ededed',
+      paddingTop: 155,
     },
     label: {
       fontSize: 16,
-      fontWeight: 'bold',
+      fontFamily: 'san-serif',
       marginVertical: verticalScale(spacing.s_8),
       color: '#333',
     },

@@ -5,7 +5,7 @@ const useStyles = () => {
     container: {
       flexDirection: 'row',
       alignItems: 'center',
-      padding: 10,
+      // padding: 10,
       justifyContent: 'space-between',
     },
     placeholder: {

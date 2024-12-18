@@ -1,43 +1,9 @@
 import {TextInput} from '@/components';
 import React, {useCallback, useState} from 'react';
-import {Button, ScrollView, Text} from 'react-native';
+import {Text, TouchableOpacity, View} from 'react-native';
+import {validationRules} from './services';
 import useStyles from './styles';
 
-type ValidationRule = {
-  required: boolean;
-  validate?: (value: string) => boolean;
-  message: string;
-};
-type ValidationRules = Record<string, ValidationRule>;
-
-const validationRules: ValidationRules = {
-  fullName: {
-    required: true,
-    message: 'Full Name is required.',
-  },
-  phoneNumber: {
-    required: true,
-    validate: (value: string) => /^\d{10}$/.test(value),
-    message: 'Phone Number must be 10 digits.',
-  },
-  age: {
-    required: true,
-    validate: (value: string) => /^\d+$/.test(value) && parseInt(value, 10) > 0,
-    message: 'Age must be a positive number.',
-  },
-  gender: {
-    required: true,
-    validate: (value: string) =>
-      ['Male', 'Female', 'Other'].includes(value.trim()),
-    message: 'Enter gender details (Male, Female, Other).',
-  },
-  profileImage: {
-    required: false,
-    validate: (value: string) =>
-      !value || /^(https?:\/\/.*\.(?:png|jpg|jpeg|gif))$/i.test(value),
-    message: 'Profile Image must be a valid URL (optional).',
-  },
-};
 export default function AddWellnessPartner() {
   const styles = useStyles();
   // const {uid} = useUserStore();
@@ -88,14 +54,35 @@ export default function AddWellnessPartner() {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
+      <Text
+        style={{
+          fontFamily: 'san-serif',
+          fontSize: 20,
+          textAlign: 'center',
+          position: 'absolute',
+          marginTop: 30,
+          left: 17,
+        }}>
+        Sign Up
+      </Text>
       <Text style={styles.label}>Full Name</Text>
       <TextInput
         value={form.fullName}
         onChangeText={value => handleInputChange('fullName', value)}
         placeHolder="Enter full name"
       />
-      {errors.fullName && <Text style={{color: 'red'}}>{errors.fullName}</Text>}
+      {errors.fullName && (
+        <Text
+          style={{
+            color: '#ff6347',
+            left: '81%',
+            top: 168,
+            position: 'absolute',
+          }}>
+          {errors.fullName}
+        </Text>
+      )}
 
       <Text style={styles.label}>Phone Number</Text>
       <TextInput
@@ -103,30 +90,81 @@ export default function AddWellnessPartner() {
         onChangeText={value => handleInputChange('phoneNumber', value)}
         placeHolder="Enter phone number"
       />
-
-      <Text style={styles.label}>Age</Text>
-      <TextInput
-        value={form.age}
-        onChangeText={value => handleInputChange('age', value)}
-        placeHolder="Enter age"
-      />
-
-      <Text style={styles.label}>Gender</Text>
-      <TextInput
-        value={form.gender}
-        onChangeText={value => handleInputChange('gender', value)}
-        placeHolder="Enter gender (e.g., Male, Female, Other)"
-      />
-      <Text style={styles.label}>Profile Image (Optional)</Text>
+      {errors.phoneNumber && (
+        <Text
+          style={{
+            color: '#ff6347',
+            left: '81%',
+            top: 283,
+            position: 'absolute',
+          }}>
+          {errors.phoneNumber}
+        </Text>
+      )}
+      <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+        <View style={{width: '45%'}}>
+          <Text style={styles.label}>Age</Text>
+          <TextInput
+            value={form.age}
+            onChangeText={value => handleInputChange('age', value)}
+            placeHolder="Enter age"
+          />
+          {errors.age && (
+            <Text
+              style={{
+                color: '#ff6347',
+                left: '52%',
+                bottom: '71%',
+                position: 'absolute',
+              }}>
+              {errors.age}
+            </Text>
+          )}
+        </View>
+        <View style={{width: '45%'}}>
+          <Text style={styles.label}>Gender</Text>
+          <TextInput
+            value={form.gender}
+            onChangeText={value => handleInputChange('gender', value)}
+            placeHolder="Enter gender"
+          />
+          {errors.gender && (
+            <Text
+              style={{
+                color: '#ff6347',
+                left: '52%',
+                bottom: '71%',
+                position: 'absolute',
+              }}>
+              {errors.gender}
+            </Text>
+          )}
+        </View>
+      </View>
+      {/* <Text style={styles.label}>Profile Image (Optional)</Text>
       <TextInput
         value={form.profileImage}
         onChangeText={value => handleInputChange('profileImage', value)}
         placeHolder="Enter image URL"
-      />
-
-      <Button title="add wellness partner" onPress={handleSubmit} />
-      <Button title="get wellness partner" onPress={() => {}} />
-      <Button title="delete" onPress={() => {}} />
-    </ScrollView>
+      /> */}
+      <TouchableOpacity
+        style={{
+          height: 60,
+          width: 110,
+          backgroundColor: '#3cb371',
+          justifyContent: 'center',
+          alignItems: 'center',
+          borderRadius: 17,
+          position: 'absolute',
+          bottom: 50,
+          alignSelf: 'center',
+        }}>
+        <Text
+          style={{color: '#fff', fontSize: 16, fontWeight: 'bold'}}
+          onPress={handleSubmit}>
+          Submit
+        </Text>
+      </TouchableOpacity>
+    </View>
   );
 }

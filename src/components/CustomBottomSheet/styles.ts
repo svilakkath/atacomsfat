@@ -3,12 +3,10 @@ import {StyleSheet} from 'react-native';
 const useStyles = () => {
   return StyleSheet.create({
     overlay: {
-      flex: 1,
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
       justifyContent: 'flex-end',
     },
     bottomSheet: {
-      backgroundColor: '#fff',
+      backgroundColor: '#ededed',
       borderTopLeftRadius: 20,
       borderTopRightRadius: 20,
       overflow: 'hidden',

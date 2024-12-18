@@ -1,3 +1,4 @@
+import {Header} from '@/components';
 import {RootStackParamList} from '@/types/common';
 import {NavigationProp, RouteProp, useRoute} from '@react-navigation/native';
 import React from 'react';
@@ -45,13 +46,19 @@ const WellnessPartnerHome = ({navigation}: WellnessHomeProps) => {
   );
 
   return (
-    <FlatList
-      data={data}
-      renderItem={renderCard}
-      keyExtractor={item => item.id.toString()}
-      numColumns={2}
-      contentContainerStyle={styles.container}
-    />
+    <View style={{padding: 16}}>
+      <Header
+        title={'Wellness Partner Home'}
+        onBackPress={() => navigation.goBack()}
+      />
+      <FlatList
+        data={data}
+        renderItem={renderCard}
+        keyExtractor={item => item.id.toString()}
+        numColumns={2}
+        contentContainerStyle={styles.container}
+      />
+    </View>
   );
 };
 

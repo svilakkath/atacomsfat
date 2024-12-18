@@ -1,13 +1,8 @@
+import {BottomSheet, CustomCard, Header} from '@/components';
 import {RootStackParamList} from '@/types/common';
 import {RouteProp, useRoute} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
-import {
-  ActivityIndicator,
-  FlatList,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import {ActivityIndicator, Image, StyleSheet, Text, View} from 'react-native';
 import {MedicineDetailsProps} from '../types';
 import medicineDetailsService from './services';
 
@@ -16,13 +11,18 @@ type WellnessPartnerHomeRouteProp = RouteProp<
   'MedicineDetailsHome'
 >;
 
-const MedicineDetailsHome = () => {
+const MedicineDetailsHome = ({navigation}) => {
   const route = useRoute<WellnessPartnerHomeRouteProp>();
+  // const title = options?.title;
   const {wellnessPartnerId} = route.params;
+
   const [medicinesList, setMedicinesList] = useState<MedicineDetailsProps[]>(
     [],
   );
   const [loading, setLoading] = useState<boolean>(true);
+  const [isVisible, setIsVisible] = useState(false);
+  const [selectedMedicine, setSelectedMedicine] =
+    useState<MedicineDetailsProps | null>(null);
 
   useEffect(() => {
     getMedicineDetails();
@@ -36,7 +36,6 @@ const MedicineDetailsHome = () => {
         await medicineDetailsService.getAllMedicineDetailsById(
           wellnessPartnerId,
         );
-
       setMedicinesList(responseData);
     } catch (error) {
       console.error('Error fetching medicine details:', error);
@@ -45,41 +44,219 @@ const MedicineDetailsHome = () => {
     }
   }
 
-  const renderMedicineItem = ({item}: {item: MedicineDetailsProps}) => (
-    <View style={styles.card}>
-      <Text style={styles.title}>Name: {item.name}</Text>
-      <Text>Dose: {item.doseDetails}</Text>
-      <Text>Type: {item.medicineType}</Text>
-      <Text>Duration: {item.medicineDuration} days</Text>
-      <Text>Remaining: {item.remainingNumberOfMedicine}</Text>
-      <Text>Additional Note: {item.additionalNote}</Text>
-      <Text style={styles.subtitle}>Timings:</Text>
-      {item.timings.map((timing, index) => (
-        <Text key={index}>
-          - {timing.time} ({timing.timeOfDay})
-        </Text>
-      ))}
-    </View>
-  );
+  const handleItemPress = (medicine: MedicineDetailsProps) => {
+    setSelectedMedicine(medicine);
+    setIsVisible(true);
+  };
+
+  const handleClose = () => {
+    setIsVisible(false);
+    setSelectedMedicine(null);
+  };
+
+  const dayTimeImages = [
+    {
+      timeOfDay: 'Morning',
+      image: require('@/assets/images/DayTimes/morning.png'),
+    },
+    {
+      timeOfDay: 'Afternoon',
+      image: require('@/assets/images/DayTimes/afternoon.png'),
+    },
+    {
+      timeOfDay: 'Evening',
+      image: require('@/assets/images/DayTimes/evening.png'),
+    },
+    {timeOfDay: 'Night', image: require('@/assets/images/DayTimes/night.png')},
+  ];
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Medicine Details</Text>
-      {loading ? (
-        <View style={styles.loaderContainer}>
-          <ActivityIndicator size="large" color="#6200ee" />
-          <Text>Loading medicine details...</Text>
-        </View>
-      ) : medicinesList.length > 0 ? (
-        <FlatList
-          data={medicinesList}
-          keyExtractor={item => item.id}
-          renderItem={renderMedicineItem}
+    <>
+      <View style={styles.container}>
+        <Header
+          title={'Medicine Details'}
+          onBackPress={() => navigation.goBack()}
         />
-      ) : (
-        <Text>No Medicines Found</Text>
-      )}
-    </View>
+
+        {loading ? (
+          <View style={styles.loaderContainer}>
+            <ActivityIndicator size="large" color="#6200ee" />
+            <Text>Loading medicine details...</Text>
+          </View>
+        ) : medicinesList.length > 0 ? (
+          medicinesList.map(item => (
+            <CustomCard
+              key={item.id}
+              buttonTitle="Details"
+              mainText={item.name}
+              onButtonPress={() => handleItemPress(item)}
+              subText={item.doseDetails}
+            />
+          ))
+        ) : (
+          <Text>No Medicines Found</Text>
+        )}
+      </View>
+      <BottomSheet isVisible={isVisible} onClose={handleClose}>
+        {selectedMedicine ? (
+          <View style={{padding: 20}}>
+            <View style={{marginBottom: 15}}>
+              <Text
+                style={{
+                  fontSize: 25,
+                  fontWeight: '500',
+                  fontFamily: 'san-serif',
+                }}>
+                {selectedMedicine.name}
+              </Text>
+              <View style={{flexDirection: 'row', gap: 20}}>
+                <View>
+                  <Text style={{fontSize: 16, fontFamily: 'san-serif'}}>
+                    {selectedMedicine.doseDetails}
+                  </Text>
+                </View>
+                <View>
+                  <Text style={{fontSize: 16, fontFamily: 'san-serif'}}>
+                    {selectedMedicine.medicineType}
+                  </Text>
+                </View>
+              </View>
+            </View>
+
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: 15,
+              }}>
+              <View>
+                <Text style={{fontSize: 18, fontFamily: 'san-serif'}}>
+                  Medicine Duration (In days)
+                </Text>
+              </View>
+              <View
+                style={{
+                  backgroundColor: '#fff',
+                  height: 45,
+                  width: 65,
+                  borderRadius: 15,
+                  shadowColor: '#000',
+                  shadowOffset: {width: 0, height: 3},
+                  shadowOpacity: 0.2,
+                  shadowRadius: 4,
+                  elevation: 4,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <Text
+                  style={{
+                    textAlign: 'center',
+                    fontSize: 18,
+                    fontWeight: '500',
+                  }}>
+                  {selectedMedicine.medicineDuration}
+                </Text>
+              </View>
+            </View>
+            <Text style={{fontSize: 18, fontFamily: 'san-serif'}}>
+              Medicine Timings
+            </Text>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                width: '100%',
+                alignItems: 'center',
+                marginBottom: 20,
+              }}>
+              {selectedMedicine.timings.map((timing, index) => (
+                <View
+                  key={index}
+                  style={{alignItems: 'center', justifyContent: 'center'}}>
+                  {/* <View> */}
+                  {dayTimeImages.map(dayTime =>
+                    dayTime.timeOfDay === timing.timeOfDay ? (
+                      <Image source={dayTime.image} resizeMode="contain" />
+                    ) : (
+                      ''
+                    ),
+                  )}
+                  <View>
+                    <Text
+                      style={{
+                        fontFamily: 'san-serif',
+                        fontSize: 16,
+                        textAlign: 'center',
+                      }}>
+                      {timing.timeOfDay}
+                    </Text>
+                    {timing.time ? (
+                      <Text
+                        style={{
+                          fontFamily: 'san-serif',
+                          fontSize: 15,
+                          textAlign: 'center',
+                        }}>
+                        {timing.time || 'No time'}
+                      </Text>
+                    ) : (
+                      <Text
+                        style={{
+                          fontFamily: 'san-serif',
+                          fontSize: 14,
+                          color: 'gray',
+                          textAlign: 'center',
+                        }}>
+                        {'No time'}
+                      </Text>
+                    )}
+                  </View>
+                </View>
+              ))}
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+              <View>
+                <Text style={{fontSize: 18, fontFamily: 'san-serif'}}>
+                  Medicine Remaining
+                </Text>
+              </View>
+              <View
+                style={{
+                  backgroundColor: '#fff',
+                  height: 45,
+                  width: 65,
+                  borderRadius: 15,
+                  shadowColor: '#000',
+                  shadowOffset: {width: 0, height: 3},
+                  shadowOpacity: 0.2,
+                  shadowRadius: 4,
+                  elevation: 4,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <Text
+                  style={{
+                    textAlign: 'center',
+                    fontSize: 18,
+                    fontWeight: '500',
+                  }}>
+                  {selectedMedicine.remainingNumberOfMedicine ?? 'NO data'}
+                </Text>
+              </View>
+            </View>
+            {/* <Text>Additional Note: {selectedMedicine.additionalNote}</Text> */}
+          </View>
+        ) : (
+          <Text>Please wait ...</Text>
+        )}
+      </BottomSheet>
+    </>
   );
 };
 
@@ -99,18 +276,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  card: {
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 16,
-    elevation: 2,
-  },
-  title: {
+  sheetHeader: {
     fontSize: 18,
     fontWeight: 'bold',
+    marginBottom: 8,
   },
-  subtitle: {
+  sheetSubHeader: {
     marginTop: 8,
     fontSize: 16,
     fontWeight: 'bold',

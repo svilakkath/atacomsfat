@@ -1,7 +1,8 @@
 import {database} from '@/database/database';
 import MedicineDetails from '@/database/models/medicineDetails';
 import MedicineTiming from '@/database/models/medicineTiming';
-import {AddMedicineDetailsProps} from '@/screens/types';
+import {AddMedicineDetailsProps, ValidationRules} from '@/screens/types';
+import {DayTimeValues} from '@/types/common';
 import {Q} from '@nozbe/watermelondb';
 
 const medicineDetailsService = {
@@ -122,4 +123,81 @@ const medicineDetailsService = {
     console.log('mnedicine details==>', formattedPartners);
   },
 };
+
 export default medicineDetailsService;
+
+export const validationRules: Record<
+  keyof AddMedicineDetailsProps,
+  ValidationRules
+> = {
+  name: {
+    required: true,
+    message: '*Required',
+  },
+  doseDetails: {
+    required: true,
+    message: '*Required',
+  },
+  medicineType: {
+    required: false,
+    message: '',
+  },
+  medicineDuration: {
+    required: false,
+    message: 'Duration must be a positive number (in days).',
+  },
+  additionalNote: {
+    required: false,
+    message: '',
+  },
+  remainingNumberOfMedicine: {
+    required: false,
+    validate: value => !value || /^\d+$/.test(value),
+    message: 'Remaining medicine count must be a valid number.',
+  },
+  timeOfDay: {
+    required: true,
+    validate: value => value.length > 0,
+    message: 'Select at least one time of day.',
+  },
+  dayTimeValues: {
+    required: true,
+    validate: value => {
+      const timesValid = Object.values(value).every(
+        time => !time || /^([01]\d|2[0-3]):([0-5]\d)\s(AM|PM)$/.test(time),
+      );
+      return timesValid;
+    },
+    message: 'Time values must be valid 12-hour format (e.g., 08:00 AM).',
+  },
+};
+
+export const dayTimes: DayTimeValues[] = [
+  'Morning',
+  'Afternoon',
+  'Evening',
+  'Night',
+];
+
+export const MedicineTypes = [
+  {
+    name: 'Capsule',
+    normalImage: require('@/assets/images/Medicines/capsule.png'),
+    highlightedImage: require('@/assets/images/Medicines/capsule-highlight.png'),
+  },
+  {
+    name: 'Injection',
+    normalImage: require('@/assets/images/Medicines/injection.png'),
+    highlightedImage: require('@/assets/images/Medicines/injection-hignlight.png'),
+  },
+  {
+    name: 'Ointment',
+    normalImage: require('@/assets/images/Medicines/ointment.png'),
+    highlightedImage: require('@/assets/images/Medicines/ointment-highlight.png'),
+  },
+  {
+    name: 'Syrup',
+    normalImage: require('@/assets/images/Medicines/syrup.png'),
+    highlightedImage: require('@/assets/images/Medicines/syrup-highlight.png'),
+  },
+];

@@ -21,7 +21,7 @@ const {height: screenHeight} = Dimensions.get('window');
 
 export default function CustomBottomSheet({
   children,
-  initialHeight = 300,
+  initialHeight = 340,
   maxHeight = screenHeight * 0.9,
   isVisible,
   onClose,

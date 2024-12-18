@@ -1,86 +1,28 @@
+/* eslint-disable react-native/no-inline-styles */
 import {Swiper, TextInput} from '@/components';
 import {useUserStore} from '@/store';
+import {DayTimeValues} from '@/types/common';
 import React, {useCallback, useRef, useState} from 'react';
 import {
-  Button,
+  Image,
   TextInput as RnTextInput,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import medicineDetailsService from './services';
+import {AddMedicineDetailsProps} from '../types';
+import {dayTimes, MedicineTypes, validationRules} from './services';
 import useStyles from './styles';
 
-export type DayTimeValues = 'Morning' | 'Afternoon' | 'Evening' | 'Night';
-
-type AddMedicineDetailsProps = {
-  name: string;
-  doseDetails: string;
-  medicineType: string;
-  medicineDuration: string;
-  additionalNote: string;
-  remainingNumberOfMedicine: string;
-  timeOfDay: DayTimeValues[];
-  dayTimeValues: Record<string, string>;
-};
-
-type AddMedicineDetailsValidationProps = {
-  required?: boolean;
-  validate?: (value: string) => boolean;
-  message?: string;
-};
-
 type ErrorProps = Partial<Record<keyof AddMedicineDetailsProps, string>>;
-const validationRules: Record<
-  keyof AddMedicineDetailsProps,
-  AddMedicineDetailsValidationProps
-> = {
-  name: {
-    required: true,
-    message: 'Medicine name is required.',
-  },
-  doseDetails: {
-    required: true,
-    message: 'Dose details are required.',
-  },
-  medicineType: {
-    required: false,
-  },
-  medicineDuration: {
-    required: false,
-    // validate: value => /^\d+$/.test(value) && parseInt(value, 10) > 0,
-    message: 'Duration must be a positive number (in days).',
-  },
-  additionalNote: {
-    required: false,
-  },
-  remainingNumberOfMedicine: {
-    required: false,
-    validate: value => !value || /^\d+$/.test(value),
-    message: 'Remaining medicine count must be a valid number.',
-  },
-  timeOfDay: {
-    required: true,
-    validate: value => value.length > 0,
-    message: 'Select at least one time of day.',
-  },
-  dayTimeValues: {
-    required: true,
-    validate: value => {
-      const timesValid = Object.values(value).every(
-        time => !time || /^([01]\d|2[0-3]):([0-5]\d)\s(AM|PM)$/.test(time),
-      );
-      return timesValid;
-    },
-    message: 'Time values must be valid 12-hour format (e.g., 08:00 AM).',
-  },
-};
 
 export default function AddMedicineDetails() {
   const styles = useStyles();
+  const {uid} = useUserStore();
   const swiperRef = useRef<any>(null);
+  const [submit, setSubmit] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
-
+  const [errors, setErrors] = useState<ErrorProps>({});
   const [form, setForm] = useState<AddMedicineDetailsProps>({
     name: '',
     doseDetails: '',
@@ -91,57 +33,7 @@ export default function AddMedicineDetails() {
     timeOfDay: [],
     dayTimeValues: {},
   });
-  const [errors, setErrors] = useState<ErrorProps>({});
-  const [submit, setSubmit] = useState(false);
-  const {uid} = useUserStore();
-
-  const addMedicinDetails = async () => {
-    sanitizeForm();
-    await medicineDetailsService.addMedicineDetails(form, uid);
-  };
-  // const onSubmit = () => {
-  //   setSubmit(true);
-  // };
-
-  const handleSelectTimeOfDay = (value: DayTimeValues) => {
-    setForm(prevForm => {
-      const {timeOfDay, dayTimeValues} = prevForm;
-
-      let updatedTimeOfDay;
-      if (timeOfDay.includes(value)) {
-        updatedTimeOfDay = timeOfDay.filter(item => item !== value);
-      } else {
-        updatedTimeOfDay = [...timeOfDay, value];
-      }
-
-      const updatedDayTimeValues = {
-        ...dayTimeValues,
-        [value]: timeOfDay.includes(value) ? '' : dayTimeValues[value] || '',
-      };
-
-      if (updatedTimeOfDay.length > 0) {
-        setErrors(prevErrors => ({...prevErrors, timeOfDay: ''}));
-      }
-
-      return {
-        ...prevForm,
-        timeOfDay: updatedTimeOfDay,
-        dayTimeValues: updatedDayTimeValues,
-      };
-    });
-  };
-
-  const sanitizeForm = () => {
-    const sanitizedTimeInputs = Object.fromEntries(
-      Object.entries(form.dayTimeValues).filter(([timeOfDay, _]) =>
-        form.timeOfDay.includes(timeOfDay as DayTimeValues),
-      ),
-    );
-    return {
-      ...form,
-      dayTimeValues: sanitizedTimeInputs,
-    };
-  };
+  const [selectedType, setSelectedType] = useState<string | null>();
 
   const handleInputChange = (
     field: keyof AddMedicineDetailsProps,
@@ -174,26 +66,110 @@ export default function AddMedicineDetails() {
     }
   };
 
+  const handleSelectTimeOfDay = (value: DayTimeValues) => {
+    setForm(prevForm => {
+      const {timeOfDay, dayTimeValues} = prevForm;
+
+      let updatedTimeOfDay;
+      if (timeOfDay.includes(value)) {
+        updatedTimeOfDay = timeOfDay.filter(item => item !== value);
+      } else {
+        updatedTimeOfDay = [...timeOfDay, value];
+      }
+
+      const updatedDayTimeValues = {
+        ...dayTimeValues,
+        [value]: timeOfDay.includes(value) ? '' : dayTimeValues[value] || '',
+      };
+
+      if (updatedTimeOfDay.length > 0) {
+        setErrors(prevErrors => ({...prevErrors, timeOfDay: ''}));
+      }
+
+      return {
+        ...prevForm,
+        timeOfDay: updatedTimeOfDay,
+        dayTimeValues: updatedDayTimeValues,
+      };
+    });
+  };
+
   const handleTimeFormatChange = (
     timeOfDay: DayTimeValues,
     format: 'AM' | 'PM',
   ) => {
     const time = (form.dayTimeValues[timeOfDay] || '').split(' ')[0];
-    setForm(prevForm => ({
-      ...prevForm,
-      dayTimeValues: {
-        ...prevForm.dayTimeValues,
-        [timeOfDay]: time + ' ' + format,
-      },
-    }));
+    if (time) {
+      console.log('====>', time);
+      setForm(prevForm => ({
+        ...prevForm,
+        dayTimeValues: {
+          ...prevForm.dayTimeValues,
+          [timeOfDay]: time + ' ' + format,
+        },
+      }));
+    }
   };
 
-  const dayTimes: DayTimeValues[] = [
-    'Morning',
-    'Afternoon',
-    'Evening',
-    'Night',
-  ];
+  const handleSelect = (type: string) => {
+    if (type === selectedType) {
+      setSelectedType(null);
+      return;
+    }
+    handleInputChange('medicineType', type);
+    setSelectedType(type);
+  };
+
+  const goToNextPage = () => {
+    setSubmit(true);
+    const isValid = validateCurrentPage();
+
+    if (!isValid) {
+      return;
+    }
+
+    if (swiperRef.current && currentPage < 1) {
+      swiperRef.current.goToPage(currentPage + 1);
+      setCurrentPage(currentPage + 1);
+    } else if (currentPage === 1) {
+      handleSubmit();
+    }
+  };
+
+  const handleSubmit = () => {
+    console.log('submitted==>');
+    const isValid = validateCurrentPage();
+
+    if (!isValid) {
+      return;
+    }
+    addMedicinDetails();
+  };
+
+  const goToPreviousPage = () => {
+    if (swiperRef.current && currentPage > 0) {
+      swiperRef.current.goToPage(currentPage - 1);
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const sanitizeForm = () => {
+    const sanitizedTimeInputs = Object.fromEntries(
+      Object.entries(form.dayTimeValues).filter(([timeOfDay, _]) =>
+        form.timeOfDay.includes(timeOfDay as DayTimeValues),
+      ),
+    );
+    return {
+      ...form,
+      dayTimeValues: sanitizedTimeInputs,
+    };
+  };
+
+  const addMedicinDetails = async () => {
+    sanitizeForm();
+    // await medicineDetailsService.addMedicineDetails(form, uid);
+    // console.log('form=>', form);
+  };
 
   const validateCurrentPage = useCallback(() => {
     const newErrors: ErrorProps = {};
@@ -220,8 +196,8 @@ export default function AddMedicineDetails() {
             if (
               (field === 'timeOfDay' &&
                 Array.isArray(value) &&
-                value.length === 0) || // Check for empty array
-              (!Array.isArray(value) && !value) // General check for falsy values
+                value.length === 0) ||
+              (!Array.isArray(value) && !value)
             ) {
               newErrors[field as keyof AddMedicineDetailsProps] =
                 validationRules[field as keyof AddMedicineDetailsProps]
@@ -236,43 +212,6 @@ export default function AddMedicineDetails() {
     return Object.keys(newErrors).length === 0;
   }, [currentPage, form]);
 
-  const goToPreviousPage = () => {
-    if (swiperRef.current && currentPage > 0) {
-      swiperRef.current.goToPage(currentPage - 1);
-      setCurrentPage(currentPage - 1);
-    }
-  };
-  const goToNextPage = () => {
-    setSubmit(true);
-    const isValid = validateCurrentPage();
-
-    if (!isValid) {
-      return;
-    }
-
-    if (swiperRef.current && currentPage < 1) {
-      swiperRef.current.goToPage(currentPage + 1);
-      setCurrentPage(currentPage + 1);
-    } else if (currentPage === 1) {
-      handleSubmit();
-    }
-  };
-  const handleSubmit = () => {
-    console.log('submitted==>');
-    const isValid = validateCurrentPage();
-
-    if (!isValid) {
-      return;
-    }
-    addMedicinDetails();
-  };
-  // const handleDelete = () => {
-  //   medicineDetailsService.deleteAllMedicineDetails();
-  // };
-  // const getDetails = () => {
-  //   medicineDetailsService.getAllMedicineDetails();
-  //   medicineDetailsService.getAllTimingDetails();
-  // };
   return (
     <View style={styles.container}>
       <Swiper
@@ -285,9 +224,18 @@ export default function AddMedicineDetails() {
             value={form.name}
             onChangeText={value => handleInputChange('name', value)}
             placeHolder="Enter medicine name"
+            left="pill"
           />
           {submit && errors.name && (
-            <Text style={styles.errorText}>{errors.name}</Text>
+            <Text
+              style={{
+                color: '#ff6347',
+                position: 'absolute',
+                top: 10,
+                right: 50,
+              }}>
+              {errors.name}
+            </Text>
           )}
 
           <Text style={styles.label}>Dose Details</Text>
@@ -295,53 +243,140 @@ export default function AddMedicineDetails() {
             value={form.doseDetails}
             onChangeText={value => handleInputChange('doseDetails', value)}
             placeHolder="Enter dose details"
+            left="move-resize"
           />
           {submit && errors.doseDetails && (
-            <Text style={styles.errorText}>{errors.doseDetails}</Text>
+            <Text
+              style={{
+                color: '#ff6347',
+                position: 'absolute',
+                top: 122,
+                right: 50,
+              }}>
+              {errors.doseDetails}
+            </Text>
           )}
-          <Text style={styles.label}>Medicine Type</Text>
-          <TextInput
-            value={form.medicineType}
-            onChangeText={value => handleInputChange('medicineType', value)}
-            placeHolder="Enter medicine type"
-          />
-          {errors.medicineType && (
-            <Text style={styles.errorText}>{errors.medicineType}</Text>
-          )}
-          <Text style={styles.label}>Medicine Duration (in days)</Text>
-          <TextInput
-            value={form.medicineDuration}
-            onChangeText={value => handleInputChange('medicineDuration', value)}
-            placeHolder="Enter duration in days"
-          />
-          {errors.medicineDuration && (
-            <Text style={styles.errorText}>{errors.medicineDuration}</Text>
-          )}
+
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-around',
+              paddingTop: 53,
+              paddingBottom: 15,
+            }}>
+            <Text
+              style={{
+                position: 'absolute',
+                fontSize: 16,
+                color: '#333',
+                marginTop: 18,
+                gap: 15,
+                fontFamily: 'san-serif',
+              }}>
+              Medicine Type
+            </Text>
+
+            {MedicineTypes.map(item => (
+              <TouchableOpacity
+                key={item.name}
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: 8,
+                  backgroundColor:
+                    selectedType === item.name ? '#389EBA' : '#f5f5f5',
+                  width: 75,
+                  height: 93,
+                  marginHorizontal: 2,
+                  shadowColor: '#000',
+                  shadowOffset: {width: 0, height: 4},
+                  shadowOpacity: 0.2,
+                  shadowRadius: 5,
+                  elevation: 5,
+                  gap: 10,
+                }}
+                onPress={() => handleSelect(item.name)}>
+                <Image
+                  source={
+                    selectedType === item.name
+                      ? item.highlightedImage
+                      : item.normalImage
+                  }
+                  style={{
+                    width: 40,
+                    height: 25,
+                    marginBottom: 2,
+                    resizeMode: 'contain',
+                  }}
+                />
+                <Text
+                  style={{
+                    fontSize: 15,
+                    textAlign: 'center',
+                    color: selectedType === item.name ? '#fff' : '#333',
+                    fontWeight: selectedType === item.name ? 'bold' : 'normal',
+                    fontFamily: 'san-serif',
+                  }}>
+                  {item.name}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <View style={{marginRight: '38%', gap: 12}}>
+            <Text
+              style={{
+                fontSize: 16,
+                color: '#333',
+                marginTop: 18,
+                fontFamily: 'san-serif',
+              }}>
+              Medicine Duration (in days)
+            </Text>
+            <TextInput
+              value={form.medicineDuration}
+              onChangeText={value =>
+                handleInputChange('medicineDuration', value)
+              }
+              placeHolder="Enter duration in days"
+              left="car-speed-limiter"
+            />
+            {errors.medicineDuration && (
+              <Text style={styles.errorText}>{errors.medicineDuration}</Text>
+            )}
+          </View>
         </View>
 
         <View style={styles.secondScreen}>
-          <Text style={styles.label}>Additional Note</Text>
-          <TextInput
-            value={form.additionalNote}
-            onChangeText={value => handleInputChange('additionalNote', value)}
-            placeHolder="Enter additional note (optional)"
-          />
-          {submit && errors.additionalNote && (
-            <Text style={styles.errorText}>{errors.additionalNote}</Text>
-          )}
-          <Text style={styles.label}>Remaining Number of Medicine</Text>
-          <TextInput
-            value={form.remainingNumberOfMedicine}
-            onChangeText={value =>
-              handleInputChange('remainingNumberOfMedicine', value)
-            }
-            placeHolder="Enter remaining number (optional)"
-          />
-          {errors.remainingNumberOfMedicine && (
-            <Text style={styles.errorText}>
-              {errors.remainingNumberOfMedicine}
-            </Text>
-          )}
+          <View style={{}}>
+            <Text style={styles.label}>Additional Note</Text>
+            <TextInput
+              value={form.additionalNote}
+              onChangeText={value => handleInputChange('additionalNote', value)}
+              placeHolder="Enter additional note (optional)"
+              left="text"
+            />
+            {submit && errors.additionalNote && (
+              <Text style={styles.errorText}>{errors.additionalNote}</Text>
+            )}
+          </View>
+
+          <View style={{marginTop: 9, marginBottom: 7}}>
+            <Text style={styles.label}>Remaining Number of Medicine</Text>
+            <TextInput
+              value={form.remainingNumberOfMedicine}
+              onChangeText={value =>
+                handleInputChange('remainingNumberOfMedicine', value)
+              }
+              placeHolder="Enter remaining number (optional)"
+              left="minus-circle-outline"
+            />
+            {errors.remainingNumberOfMedicine && (
+              <Text style={styles.errorText}>
+                {errors.remainingNumberOfMedicine}
+              </Text>
+            )}
+          </View>
           <Text style={styles.label}>Time of Day</Text>
           {submit && errors.timeOfDay && (
             <Text style={styles.errorText}>{errors.timeOfDay}</Text>
@@ -350,8 +385,8 @@ export default function AddMedicineDetails() {
             <View key={time} style={styles.timeOfDayRow}>
               <TouchableOpacity
                 style={[
-                  styles.timeButton,
-                  form.timeOfDay.includes(time) && styles.selectedTimeButton,
+                  styles.dayTimeButton,
+                  form.timeOfDay.includes(time) && styles.selectedDayTimeButton,
                 ]}
                 onPress={() => handleSelectTimeOfDay(time)}>
                 <Text
@@ -364,14 +399,14 @@ export default function AddMedicineDetails() {
               </TouchableOpacity>
               {form.timeOfDay.includes(time) && (
                 <>
-                  <View style={styles.test}>
+                  <View style={styles.timeValue}>
                     <RnTextInput
-                      style={styles.input}
                       value={(form.dayTimeValues[time] || '').split(' ')[0]}
                       onChangeText={value => handleTimeInputChange(time, value)}
                       placeholder="hh:mm"
                       keyboardType="numeric"
                       maxLength={5}
+                      style={{textAlign: 'center'}}
                     />
                   </View>
                   <View style={styles.formatContainer}>
@@ -382,7 +417,14 @@ export default function AddMedicineDetails() {
                           styles.selectedFormatButton,
                       ]}
                       onPress={() => handleTimeFormatChange(time, 'AM')}>
-                      <Text style={styles.formatText}>AM</Text>
+                      <Text
+                        style={[
+                          styles.formatText,
+                          (form.dayTimeValues[time] || '').endsWith('AM') &&
+                            styles.selectedFormatText,
+                        ]}>
+                        AM
+                      </Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -392,26 +434,37 @@ export default function AddMedicineDetails() {
                           styles.selectedFormatButton,
                       ]}
                       onPress={() => handleTimeFormatChange(time, 'PM')}>
-                      <Text style={styles.formatText}>PM</Text>
+                      <Text
+                        style={[
+                          styles.formatText,
+                          (form.dayTimeValues[time] || '').endsWith('PM') &&
+                            styles.selectedFormatText,
+                        ]}>
+                        PM
+                      </Text>
                     </TouchableOpacity>
                   </View>
                 </>
               )}
             </View>
           ))}
-          {/* <TouchableOpacity style={styles.submitButton} onPress={onSubmit}>
-        <Text style={styles.submitButtonText}>Submit</Text>
-      </TouchableOpacity> */}
-          <Button title="get" onPress={() => {}} />
         </View>
       </Swiper>
-      <View style={styles.buttonContainer}>
-        {currentPage > 0 && <Button title="Back" onPress={goToPreviousPage} />}
-        <Button
-          title={currentPage === 1 ? 'Submit' : 'Next'}
-          onPress={goToNextPage}
-        />
-      </View>
+
+      {currentPage > 0 && (
+        <TouchableOpacity onPress={goToPreviousPage} style={styles.backButton}>
+          <Text style={{color: '#fff', fontSize: 16, fontWeight: 'bold'}}>
+            Back
+          </Text>
+        </TouchableOpacity>
+      )}
+      <TouchableOpacity
+        style={currentPage === 1 ? styles.submitButton : styles.nextButton}
+        onPress={goToNextPage}>
+        <Text style={{color: '#fff', fontSize: 16, fontWeight: 'bold'}}>
+          {currentPage === 1 ? 'Submit' : 'Next'}
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }
