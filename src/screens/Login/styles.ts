@@ -17,7 +17,7 @@ const useStyles = () => {
     button: {
       width: '100%',
       height: 50,
-      backgroundColor: '#007bff',
+      backgroundColor: '#3cb371',
       justifyContent: 'center',
       alignItems: 'center',
       borderRadius: 8,

@@ -5,7 +5,7 @@ import {RootStackParamList} from '@/types/common';
 import auth from '@react-native-firebase/auth';
 import {NavigationProp} from '@react-navigation/native';
 import React, {useCallback, useRef, useState} from 'react';
-import {Button, Text, TouchableOpacity, View} from 'react-native';
+import {Text, TouchableOpacity, View} from 'react-native';
 import {UserSignupProps, ValidationRules} from '../types';
 import userService from './services';
 import useStyles from './styles';
@@ -137,6 +137,17 @@ const SignUp = ({navigation}: LoginProps) => {
 
   return (
     <View style={styles.container}>
+      <Text
+        style={{
+          fontSize: 20,
+          fontFamily: 'san-serif',
+          fontWeight: '500',
+          textAlign: 'center',
+          marginTop: 50,
+          marginBottom: 50,
+        }}>
+        Sign Up
+      </Text>
       <Swiper
         ref={swiperRef}
         isScrollable={false}
@@ -206,16 +217,21 @@ const SignUp = ({navigation}: LoginProps) => {
 
       <View style={styles.buttonContainer}>
         {currentPage > 0 && (
-          <View style={{position: 'absolute', top: 270, left: 25}}>
-            <Button title="Back" onPress={goToPreviousPage} />
-          </View>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={goToPreviousPage}>
+            <Text style={{color: '#fff', fontSize: 16, fontWeight: 'bold'}}>
+              Back
+            </Text>
+          </TouchableOpacity>
         )}
-        <View style={{top: 270, left: 150}}>
-          <Button
-            title={currentPage === 1 ? 'Submit' : 'Next'}
-            onPress={goToNextPage}
-          />
-        </View>
+        <TouchableOpacity
+          onPress={goToNextPage}
+          style={currentPage === 1 ? styles.submitButton : styles.nextButton}>
+          <Text style={{color: '#fff', fontSize: 16, fontWeight: 'bold'}}>
+            {currentPage === 1 ? 'Submit' : 'Next'}
+          </Text>
+        </TouchableOpacity>
       </View>
     </View>
   );

@@ -1,6 +1,6 @@
 import {NavigationProp} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
-import {FlatList, StyleSheet, Text, View} from 'react-native';
+import {FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 
 import {CustomCard, Header} from '@/components';
 import {useUserStore} from '@/store';
@@ -39,29 +39,51 @@ const WellnessPartnerList = ({navigation}: WellnessListProps) => {
     }
   };
 
-  const handlenavigation = (
+  const handleNavigationToDetails = (
     wellnessPartner: AllWellnessPartnersDetailsProps,
   ) => {
     navigation.navigate('WellnessPartnerHome', {wellnessPartner});
   };
+
+  // const handleNavigationToAddPartner = () => {
+  //   navigation.navigate('AddWellnessPartner');
+  // };
 
   const renderPartner = ({item}: {item: AllWellnessPartnersDetailsProps}) => (
     <CustomCard
       buttonTitle="Details"
       subText={item.gender}
       mainText={item.fullName}
-      onButtonPress={() => handlenavigation(item)}
+      onButtonPress={() => handleNavigationToDetails(item)}
     />
   );
 
   return (
     <View style={styles.container}>
       <Header
-        title={'Wellness Partners List'}
+        title="Wellness Partners List"
         onBackPress={() => navigation.goBack()}
+        rightComponent={
+          <TouchableOpacity
+            onPress={() => navigation.navigate('AddWellnessPartner')}
+            style={{
+              height: 35,
+              width: 60,
+              backgroundColor: '#3cb371',
+              justifyContent: 'center',
+              alignItems: 'center',
+              borderRadius: 13,
+              // position: 'absolute',
+              alignSelf: 'center',
+            }}>
+            <Text style={{color: '#fff', fontSize: 16, fontWeight: 'bold'}}>
+              Add
+            </Text>
+          </TouchableOpacity>
+        }
       />
       {loading ? (
-        <View>
+        <View style={styles.loadingContainer}>
           <Text>Loading...</Text>
         </View>
       ) : (
@@ -85,5 +107,15 @@ const styles = StyleSheet.create({
   },
   list: {
     marginTop: 16,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

@@ -36,6 +36,12 @@ const useStyles = () => {
       fontSize: 16,
       fontWeight: 'bold',
     },
+    successButton: {
+      backgroundColor: 'green',
+    },
+    failButton: {
+      backgroundColor: 'red',
+    },
   });
 };
 export default useStyles;

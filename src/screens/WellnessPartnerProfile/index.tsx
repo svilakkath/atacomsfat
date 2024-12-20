@@ -14,6 +14,8 @@ type WellnessPartnerProfileRouteProp = RouteProp<
 const WellnessPartnerProfile = () => {
   const route = useRoute<WellnessPartnerProfileRouteProp>();
   const {wellnessPartnerId} = route.params;
+  console.log(wellnessPartnerId);
+
   const [wellNessPartnerDetails, setWellNessPartnerDetails] =
     useState<WellnessPartnerProfileProps | null>();
 

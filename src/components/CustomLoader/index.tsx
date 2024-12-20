@@ -34,7 +34,7 @@ const CustomLoader: React.FC<CustomLoaderProps> = ({size = 10, gap = 5}) => {
   const onStartAnimate = () => {
     const onThreeAnimation = () => {
       onAnimate(animations.three, () => {
-        setTimeout(onStartAnimate, 500);
+        setTimeout(onStartAnimate, 100);
       });
     };
 

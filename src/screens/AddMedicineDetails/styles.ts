@@ -148,6 +148,12 @@ const useStyles = () => {
       bottom: 7,
       right: 25,
     },
+    successButton: {
+      backgroundColor: 'green',
+    },
+    failButton: {
+      backgroundColor: 'red',
+    },
   });
 };
 export default useStyles;
