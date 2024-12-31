@@ -2,7 +2,7 @@ import {NavigationProp} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 
-import {CustomCard, Header} from '@/components';
+import {CustomCard, Header, Loader, PreviewModal} from '@/components';
 import {useUserStore} from '@/store';
 import {RootStackParamList} from '@/types/common';
 import {AllWellnessPartnersDetailsProps} from '../types';
@@ -18,6 +18,14 @@ const WellnessPartnerList = ({navigation}: WellnessListProps) => {
     [],
   );
   const [loading, setLoading] = useState<boolean>(true);
+  const [deleteoading, setDeleteLoading] = useState<boolean>(false);
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const [selectePartner, setSelectePartner] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
 
   useEffect(() => {
     getWellnessPartnersDetails();
@@ -45,56 +53,87 @@ const WellnessPartnerList = ({navigation}: WellnessListProps) => {
     navigation.navigate('WellnessPartnerHome', {wellnessPartner});
   };
 
-  // const handleNavigationToAddPartner = () => {
-  //   navigation.navigate('AddWellnessPartner');
-  // };
+  async function handleDelete() {
+    setDeleteLoading(true);
+    if (selectePartner && selectePartner.id) {
+      try {
+        const result = await wellnessPartnerList.deleteWellnessPartnerById(
+          selectePartner.id,
+        );
+        if (result.success) {
+          console.log(result.message);
+          setPartners(prevPartners =>
+            prevPartners.filter(partner => partner.id !== selectePartner.id),
+          );
+        }
+      } catch (error) {
+        console.error('Error fetching wellness partners:', error);
+      } finally {
+        setTimeout(() => {
+          setDeleteLoading(false);
+          setIsModalVisible(false);
+          setSelectePartner(null);
+        }, 1500);
+      }
+    }
+  }
+
+  const handleSelect = (item: AllWellnessPartnersDetailsProps) => {
+    setIsModalVisible(true);
+    setSelectePartner({id: item.id, name: item.fullName});
+  };
 
   const renderPartner = ({item}: {item: AllWellnessPartnersDetailsProps}) => (
-    <CustomCard
-      buttonTitle="Details"
-      subText={item.gender}
-      mainText={item.fullName}
-      onButtonPress={() => handleNavigationToDetails(item)}
-    />
+    <TouchableOpacity
+      key={item.id}
+      onPress={() => handleNavigationToDetails(item)}>
+      <CustomCard
+        buttonTitle="Delete"
+        subText={item.gender}
+        mainText={item.fullName}
+        onButtonPress={() => handleSelect(item)}
+      />
+    </TouchableOpacity>
   );
 
   return (
-    <View style={styles.container}>
-      <Header
-        title="Wellness Partners List"
-        onBackPress={() => navigation.goBack()}
-        rightComponent={
-          <TouchableOpacity
-            onPress={() => navigation.navigate('AddWellnessPartner')}
-            style={{
-              height: 35,
-              width: 60,
-              backgroundColor: '#3cb371',
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderRadius: 13,
-              // position: 'absolute',
-              alignSelf: 'center',
-            }}>
-            <Text style={{color: '#fff', fontSize: 16, fontWeight: 'bold'}}>
-              Add
-            </Text>
-          </TouchableOpacity>
-        }
+    <>
+      <PreviewModal
+        isVisible={isModalVisible}
+        message={`Are you sure you want to delete "${selectePartner?.name}"?`}
+        onClose={handleDelete}
+        buttonText={deleteoading ? 'Loading..' : 'Delete'}
+        buttonStyle={styles.deleteButton}
+        buttonTextStyle={styles.buttonText}
+        onCancel={() => setIsModalVisible(false)}
       />
-      {loading ? (
-        <View style={styles.loadingContainer}>
-          <Text>Loading...</Text>
-        </View>
-      ) : (
-        <FlatList
-          data={partners}
-          keyExtractor={item => item.id}
-          renderItem={renderPartner}
-          contentContainerStyle={styles.list}
+      <View style={styles.container}>
+        <Header
+          title="Wellness Partners List"
+          onBackPress={() => navigation.goBack()}
+          rightComponent={
+            <TouchableOpacity
+              onPress={() => navigation.navigate('AddWellnessPartner')}
+              style={styles.addButton}>
+              <Text style={styles.addButtonText}>Add</Text>
+            </TouchableOpacity>
+          }
         />
-      )}
-    </View>
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            {/* <Text>Loading...</Text> */}
+            <Loader gap={10} size={15} />
+          </View>
+        ) : (
+          <FlatList
+            data={partners}
+            keyExtractor={item => item.id}
+            renderItem={renderPartner}
+            contentContainerStyle={styles.list}
+          />
+        )}
+      </View>
+    </>
   );
 };
 
@@ -113,9 +152,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  emptyContainer: {
-    flex: 1,
+  deleteButton: {
+    backgroundColor: 'red',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '500',
+  },
+  addButton: {
+    height: 35,
+    width: 60,
+    backgroundColor: '#3cb371',
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 13,
+  },
+  addButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });

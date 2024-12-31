@@ -18,12 +18,12 @@ const CustomLoader: React.FC<CustomLoaderProps> = ({size = 10, gap = 5}) => {
     Animated.sequence([
       Animated.timing(animation, {
         toValue: -size / 2, // Adjust bounce height based on size
-        duration: 200,
+        duration: 100,
         useNativeDriver: true,
       }),
       Animated.timing(animation, {
         toValue: 0,
-        duration: 200,
+        duration: 100,
         useNativeDriver: true,
       }),
     ]).start(() => {
