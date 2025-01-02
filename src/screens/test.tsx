@@ -4,8 +4,6 @@ import {StyleSheet, View} from 'react-native';
 
 const GenderSelectorModal = () => {
   const [selectedGender, setSelectedGender] = useState<string>('');
-  console.log(selectedGender);
-
   return (
     <View style={styles.screen}>
       <Selector

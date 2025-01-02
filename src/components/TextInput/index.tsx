@@ -21,6 +21,7 @@ type TextInputProps = {
   placeHolder?: string;
   errors?: string;
   disabled?: boolean;
+  editable?: boolean; // Added the 'editable' property
   accessibilityHint?: string;
   accessibilityLabel?: string;
   type?: TextInputTypes;
@@ -39,6 +40,7 @@ export default function TextInput({
   placeHolder,
   errors,
   disabled,
+  editable = true, // Default to true if not provided
   accessibilityLabel,
   accessibilityHint,
   type,
@@ -142,6 +144,7 @@ export default function TextInput({
         style={[styles.textInput, inputStyle]}
         activeUnderlineColor={colors.transparent}
         disabled={disabled}
+        editable={editable} // Pass the 'editable' property here
         onFocus={handleFocus}
         onBlur={handleBlur}
         secureTextEntry={!isPasswordVisible && secureTextEntry}

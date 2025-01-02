@@ -61,7 +61,6 @@ const WellnessPartnerList = ({navigation}: WellnessListProps) => {
           selectePartner.id,
         );
         if (result.success) {
-          console.log(result.message);
           setPartners(prevPartners =>
             prevPartners.filter(partner => partner.id !== selectePartner.id),
           );

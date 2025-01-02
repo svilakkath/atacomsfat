@@ -37,8 +37,6 @@ export default function AddMedicineDetails({
 }: AddMedicineDetailsNavigationProps) {
   const route = useRoute<AddMedicineDetailsRouteProp>();
   const {wellnessPartnerId} = route.params;
-  console.log(wellnessPartnerId);
-
   const styles = useStyles();
   const {uid} = useUserStore();
   const swiperRef = useRef<any>(null);
@@ -124,7 +122,6 @@ export default function AddMedicineDetails({
   ) => {
     const time = (form.dayTimeValues[timeOfDay] || '').split(' ')[0];
     if (time) {
-      console.log('====>', time);
       setForm(prevForm => ({
         ...prevForm,
         dayTimeValues: {
@@ -161,7 +158,6 @@ export default function AddMedicineDetails({
   };
 
   const handleSubmit = () => {
-    console.log('submitted==>');
     const isValid = validateCurrentPage();
 
     if (!isValid) {

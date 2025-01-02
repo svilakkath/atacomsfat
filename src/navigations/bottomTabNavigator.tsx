@@ -1,7 +1,7 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import React from 'react';
 
-import AddMedicineDetails from '@/screens/AddMedicineDetails';
+import EditUserProfile from '@/screens/EditUserProfile';
 import Home from '@/screens/Home';
 import WellnessPartnerList from '@/screens/WellnessPartnerList';
 
@@ -12,7 +12,7 @@ export default function BottomTabNavigator() {
     <Tab.Navigator screenOptions={{headerShown: false}} initialRouteName="Home">
       <Tab.Screen name="Home" component={Home} />
       <Tab.Screen name="WellnessPartnersList" component={WellnessPartnerList} />
-      <Tab.Screen name="Profile" component={AddMedicineDetails} />
+      <Tab.Screen name="Profile" component={EditUserProfile} />
     </Tab.Navigator>
   );
 }

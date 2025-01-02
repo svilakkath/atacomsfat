@@ -6,102 +6,6 @@ import {DayTimeValues} from '@/types/common';
 import {Q} from '@nozbe/watermelondb';
 
 const medicineDetailsService = {
-  // addMedicineDetails: async (
-  //   form: AddMedicineDetailsProps,
-  //   uid: string | null,
-  // ):Promise<{success: boolean; message: string; id?: string}>  => {
-  //   const {
-  //     name,
-  //     doseDetails,
-  //     medicineType,
-  //     medicineDuration,
-  //     additionalNote,
-  //     remainingNumberOfMedicine,
-  //     dayTimeValues,
-  //   } = form;
-
-  //   try {
-  //     const medicineDetails =
-  //       database.get<MedicineDetails>('medicines_details');
-
-  //     const medicineTimingDetails =
-  //       database.get<MedicineTiming>('medicine_timings');
-
-  //     const userCollection = database.get('users');
-  //     const wellnessPartnerDetails = database.get('wellness_partners');
-
-  //     return await database.write(async () => {
-  //       const users = await userCollection
-  //         .query(Q.where('user_auth_id', uid))
-  //         .fetch();
-
-  //       if (users.length === 0) {
-  //         console.error('No user found with the provided userAuthId');
-  //         return;
-  //       }
-
-  //       const foundUser = users[0];
-  //       const userId = foundUser._raw.id;
-  //       const wellnessDetails = await wellnessPartnerDetails
-  //         .query(Q.where('user_id', userId))
-  //         .fetch();
-
-  //       if (wellnessDetails.length === 0) {
-  //         console.error('No wellness partner found');
-  //         return {
-  //           success: false,
-  //           message: 'No user found with the provided userAuthId',
-  //         };
-  //       }
-
-  //       const foundWellnessPartner = wellnessDetails[0];
-
-  //       const medicineDetailsResponseData = await medicineDetails.create(
-  //         medicineDetailsValues => {
-  //           medicineDetailsValues.additionalNote = additionalNote;
-  //           medicineDetailsValues.doseDetails = doseDetails;
-  //           medicineDetailsValues.medicineDuration = parseInt(
-  //             medicineDuration,
-  //             10,
-  //           );
-  //           medicineDetailsValues.medicineType = medicineType;
-  //           medicineDetailsValues.name = name;
-  //           medicineDetailsValues.remainingNumberOfMedicine = parseInt(
-  //             remainingNumberOfMedicine,
-  //             10,
-  //           );
-
-  //           medicineDetailsValues.wellnessPartner.set(foundWellnessPartner);
-  //         },
-  //       );
-
-  //       if (medicineDetailsResponseData) {
-  //         Object.entries(dayTimeValues).forEach(async ([timeOfDays, times]) => {
-  //           await medicineTimingDetails.create(medicineTimingDetailsValues => {
-  //             medicineTimingDetailsValues.time = times || '';
-  //             medicineTimingDetailsValues.timeOfDay = timeOfDays;
-
-  //             medicineTimingDetailsValues.medicine.set(
-  //               medicineDetailsResponseData,
-  //             );
-  //           });
-  //         });
-  //       }
-  //       console.log('medicine details and timing details added successfully');
-  //       return {
-  //         success: true,
-  //         message: 'Wellness Partner added successfully',
-  //       };
-  //     });
-  //   } catch (error) {
-  //     console.error('Error adding wellness partner:', error);
-  //     return {
-  //       success: false,
-  //       message: `Error ${error} `,
-  //     };
-  //   }
-  // },
-  ///////////////////////////////////////////////////////////////////
   addMedicineDetails: async (
     form: AddMedicineDetailsProps,
     uid: string | null,
@@ -174,9 +78,6 @@ const medicineDetailsService = {
         );
 
         if (medicineDetailsResponseData) {
-          console.log('if===>', medicineDetailsResponseData);
-
-          // await Promise.all(
           Object.entries(dayTimeValues).map(([timeOfDays, times]) =>
             medicineTimingDetails.create(medicineTimingDetailsValues => {
               medicineTimingDetailsValues.time = times || '';
@@ -186,7 +87,6 @@ const medicineDetailsService = {
               );
             }),
           );
-          // );
         }
 
         console.log('Medicine details and timing details added successfully');
@@ -226,7 +126,6 @@ const medicineDetailsService = {
     const wellnessPartnerCollection = await database.get('medicines_details');
     const partners = await wellnessPartnerCollection.query().fetch();
     const formattedPartners = partners.map((partner: any) => partner._raw);
-
     console.log('mnedicine details==>', formattedPartners);
   },
   getAllTimingDetails: async () => {
