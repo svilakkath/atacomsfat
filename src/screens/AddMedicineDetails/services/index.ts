@@ -35,7 +35,6 @@ const medicineDetailsService = {
           .fetch();
 
         if (users.length === 0) {
-          console.error('No user found with the provided userAuthId');
           return {
             success: false,
             message: 'No user found with the provided userAuthId',
