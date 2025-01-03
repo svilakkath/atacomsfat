@@ -1,10 +1,11 @@
-import {NavigationProp} from '@react-navigation/native';
+import {NavigationProp, useFocusEffect} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {FlatList, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 
 import {CustomCard, Header, Loader, PreviewModal} from '@/components';
 import {useUserStore} from '@/store';
 import {RootStackParamList} from '@/types/common';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {AllWellnessPartnersDetailsProps} from '../types';
 import wellnessPartnerList from './services';
 
@@ -17,6 +18,8 @@ const WellnessPartnerList = ({navigation}: WellnessListProps) => {
   const [partners, setPartners] = useState<AllWellnessPartnersDetailsProps[]>(
     [],
   );
+  console.log('rendering');
+
   const [loading, setLoading] = useState<boolean>(true);
   const [deleteoading, setDeleteLoading] = useState<boolean>(false);
 
@@ -33,6 +36,7 @@ const WellnessPartnerList = ({navigation}: WellnessListProps) => {
   }, []);
 
   const getWellnessPartnersDetails = async () => {
+    setLoading(true);
     try {
       const responseData = await wellnessPartnerList.getWellnessPartnersList(
         uid,
@@ -82,15 +86,28 @@ const WellnessPartnerList = ({navigation}: WellnessListProps) => {
     setSelectePartner({id: item.id, name: item.fullName});
   };
 
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log('useFocusEffect');
+
+      getWellnessPartnersDetails();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [uid]),
+  );
+
   const renderPartner = ({item}: {item: AllWellnessPartnersDetailsProps}) => (
     <TouchableOpacity
       key={item.id}
       onPress={() => handleNavigationToDetails(item)}>
       <CustomCard
-        buttonTitle="Delete"
         subText={item.gender}
         mainText={item.fullName}
-        onButtonPress={() => handleSelect(item)}
+        imageUrl={item.profileImage}
+        rightComponent={
+          <TouchableOpacity onPress={() => handleSelect(item)}>
+            <Icon name="trash-can-outline" size={24} color="#cd5c5c" />
+          </TouchableOpacity>
+        }
       />
     </TouchableOpacity>
   );
@@ -117,6 +134,7 @@ const WellnessPartnerList = ({navigation}: WellnessListProps) => {
               <Text style={styles.addButtonText}>Add</Text>
             </TouchableOpacity>
           }
+          showBackArrow={false}
         />
         {loading ? (
           <View style={styles.loadingContainer}>

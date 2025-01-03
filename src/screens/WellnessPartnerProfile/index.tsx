@@ -1,4 +1,10 @@
-import {BottomSheet, Header, PreviewModal, TextInput} from '@/components';
+import {
+  BottomSheet,
+  Header,
+  Loader,
+  PreviewModal,
+  TextInput,
+} from '@/components';
 import {RootStackParamList} from '@/types/common';
 import {NavigationProp, RouteProp, useRoute} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
@@ -26,8 +32,12 @@ const WellnessPartnerProfile = ({
   const {wellnessPartnerId} = route.params;
   const [wellNessPartnerDetails, setWellNessPartnerDetails] =
     useState<WellnessPartnerProfileProps | null>();
+  const [initialWellnessPartnerDetails, setInitialWellnessPartnerDetails] =
+    useState<WellnessPartnerProfileProps | null>();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [loader, setLoader] = useState(false);
+
   const [responseMsg, SetResponseMsg] = useState<ResponseProp | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
@@ -37,7 +47,36 @@ const WellnessPartnerProfile = ({
     'https://via.placeholder.com/100',
   );
 
+  const [errors, setErrors] = useState<{
+    fullName?: string;
+    phoneNumber?: string;
+    age?: string;
+  }>({
+    fullName: '',
+    phoneNumber: '',
+    age: '',
+  });
+
+  const validateFields = () => {
+    const newErrors: {fullName?: string; phoneNumber?: string; age?: string} =
+      {};
+    if (!wellNessPartnerDetails?.fullName) {
+      newErrors.fullName = 'Full Name is required';
+    }
+    if (!wellNessPartnerDetails?.phoneNumber) {
+      newErrors.phoneNumber = 'Phone Number is required';
+    }
+    if (!wellNessPartnerDetails?.age) {
+      newErrors.age = 'Age is required';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleEdit = async () => {
+    if (!validateFields()) {
+      return;
+    }
     if (isEditing) {
       try {
         setIsLoading(true);
@@ -46,7 +85,6 @@ const WellnessPartnerProfile = ({
           fullName: wellNessPartnerDetails?.fullName,
           phoneNumber: wellNessPartnerDetails?.phoneNumber,
           age: wellNessPartnerDetails?.age,
-          // profileImage: '',
         };
 
         const response =
@@ -73,12 +111,20 @@ const WellnessPartnerProfile = ({
   };
 
   async function getWellnessPartnerDetails() {
-    const data = await wellnessPartnerProfileService.getWellnessPartnerDetails(
-      wellnessPartnerId,
-    );
-    setImage(data.wellnessPartnerDetails?.profileImage);
-
-    setWellNessPartnerDetails(data.wellnessPartnerDetails);
+    try {
+      setLoader(true);
+      const data =
+        await wellnessPartnerProfileService.getWellnessPartnerDetails(
+          wellnessPartnerId,
+        );
+      setImage(data.wellnessPartnerDetails?.profileImage);
+      setWellNessPartnerDetails(data.wellnessPartnerDetails);
+      setInitialWellnessPartnerDetails(data.wellnessPartnerDetails);
+    } catch (error) {
+      console.error('Error getting wellmness partner details:', error);
+    } finally {
+      setLoader(false);
+    }
   }
 
   const handleDelete = () => {
@@ -106,6 +152,7 @@ const WellnessPartnerProfile = ({
       console.error('Error updating user photo:', error);
     } finally {
       setIsLoading(false);
+      setIsBottomSheetVisible(false);
     }
   };
 
@@ -133,6 +180,7 @@ const WellnessPartnerProfile = ({
     } catch (error) {
       console.error('Error updating user photo:', error);
     } finally {
+      setIsBottomSheetVisible(false);
     }
   };
   const handlePreviewModal = () => {
@@ -168,12 +216,19 @@ const WellnessPartnerProfile = ({
     } catch (error) {
       console.error('Error updating Wellness Partner photo:', error);
     } finally {
+      setIsBottomSheetVisible(false);
     }
   };
 
   const handleBottomSheet = () => {
     setIsBottomSheetVisible(false);
   };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    setWellNessPartnerDetails(initialWellnessPartnerDetails);
+  };
+
   useEffect(() => {
     getWellnessPartnerDetails();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -181,17 +236,17 @@ const WellnessPartnerProfile = ({
 
   return (
     <>
+      {loader && <Loader gap={10} size={20} />}
       {isModalVisible && (
         <PreviewModal
           isVisible={isModalVisible}
           message={responseMsg?.message}
           onClose={handlePreviewModal}
-          buttonText={
-            isLoading ? 'Loading..' : deleteModal ? 'Delete' : 'Close'
-          }
+          buttonText={isLoading ? 'Loading..' : deleteModal ? 'Delete' : 'Done'}
           buttonStyle={
             responseMsg?.success ? styles.successButton : styles.failButton
           }
+          onCancel={() => setIsModalVisible(false)}
         />
       )}
       <View style={styles.container}>
@@ -220,40 +275,109 @@ const WellnessPartnerProfile = ({
 
         <View style={styles.yourInfo}>
           <Text style={styles.yourInfoText}>Your Information</Text>
-          <TouchableOpacity onPress={handleEdit} style={styles.yourInfoButton}>
-            <Text style={styles.yourInfoButtonText}>
-              {isLoading ? 'Loading...' : isEditing ? 'Save' : 'Edit details'}
-            </Text>
-          </TouchableOpacity>
+          <View style={styles.actionButtons}>
+            <TouchableOpacity
+              onPress={handleEdit}
+              style={isEditing ? styles.saveButton : styles.editButton}>
+              <Text style={styles.yourInfoButtonText}>
+                {isLoading ? 'Loading...' : isEditing ? 'Save' : 'Edit details'}
+              </Text>
+            </TouchableOpacity>
+            {isEditing && (
+              <TouchableOpacity
+                onPress={handleCancel}
+                style={styles.cancelButton}>
+                <Text style={styles.buttonText}>Cancel</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
 
         <View style={styles.form}>
           <Text style={styles.label}>Full Name</Text>
           <TextInput
             value={wellNessPartnerDetails?.fullName ?? ''}
-            onChangeText={text =>
+            onChangeText={text => {
               setWellNessPartnerDetails(
                 prev =>
                   ({...prev, fullName: text} as WellnessPartnerProfileProps),
-              )
-            }
+              );
+              if (text.trim() === '') {
+                setErrors(prevErrors => ({
+                  ...prevErrors,
+                  fullName: 'Full name is required.',
+                }));
+              } else {
+                setErrors(prevErrors => ({
+                  ...prevErrors,
+                  fullName: '',
+                }));
+              }
+            }}
             placeHolder="Enter full name"
             editable={isEditing}
+            onIconPress={() =>
+              setWellNessPartnerDetails(
+                prev =>
+                  ({...prev, fullName: ''} as WellnessPartnerProfileProps),
+              )
+            }
+            iconType={isEditing ? 'close' : undefined}
           />
-
+          {errors.fullName && (
+            <Text style={styles.errorText}>{errors.fullName}</Text>
+          )}
           <Text style={styles.label}>Phone Number</Text>
           <TextInput
             value={wellNessPartnerDetails?.phoneNumber ?? ''}
-            onChangeText={text =>
+            onChangeText={text => {
               setWellNessPartnerDetails(
                 prev =>
-                  ({...prev, phoneNumber: text} as WellnessPartnerProfileProps),
-              )
-            }
+                  ({
+                    ...prev,
+                    phoneNumber: text,
+                  } as WellnessPartnerProfileProps),
+              );
+
+              // Validation for phone number
+              if (text.trim() === '') {
+                setErrors(prevErrors => ({
+                  ...prevErrors,
+                  phoneNumber: 'Phone number is required.',
+                }));
+              } else if (!/^\d+$/.test(text.trim())) {
+                setErrors(prevErrors => ({
+                  ...prevErrors,
+                  phoneNumber: 'Phone number should only contain digits.',
+                }));
+              } else if (text.trim().length < 10) {
+                setErrors(prevErrors => ({
+                  ...prevErrors,
+                  phoneNumber: 'Phone number should be at least 10 digits.',
+                }));
+              } else {
+                setErrors(prevErrors => ({
+                  ...prevErrors,
+                  phoneNumber: '', // Clear the error if input is valid
+                }));
+              }
+            }}
             placeHolder="Enter phone number"
             editable={isEditing}
+            onIconPress={() =>
+              setWellNessPartnerDetails(
+                prev =>
+                  ({
+                    ...prev,
+                    phoneNumber: '',
+                  } as WellnessPartnerProfileProps),
+              )
+            }
+            iconType={isEditing ? 'close' : undefined}
           />
-
+          {errors.phoneNumber && (
+            <Text style={styles.errorText}>{errors.phoneNumber}</Text>
+          )}
           <Text style={styles.label}>Age</Text>
           <TextInput
             value={wellNessPartnerDetails?.age?.toString() ?? ''}
@@ -266,10 +390,44 @@ const WellnessPartnerProfile = ({
                     age: isNaN(age) ? null : age,
                   } as WellnessPartnerProfileProps),
               );
+
+              // Validation for age
+              if (text.trim() === '') {
+                setErrors(prevErrors => ({
+                  ...prevErrors,
+                  age: 'Age is required.',
+                }));
+              } else if (isNaN(age) || age <= 0) {
+                setErrors(prevErrors => ({
+                  ...prevErrors,
+                  age: 'Please enter a valid age greater than 0.',
+                }));
+              } else {
+                setErrors(prevErrors => ({
+                  ...prevErrors,
+                  age: '', // Clear the error if input is valid
+                }));
+              }
             }}
             placeHolder="Enter age"
             editable={isEditing}
+            onIconPress={() => {
+              setWellNessPartnerDetails(
+                prev =>
+                  ({
+                    ...prev,
+                    age: null,
+                  } as unknown as WellnessPartnerProfileProps),
+              );
+              setErrors(prevErrors => ({
+                ...prevErrors,
+                age: '', // Reset error when clearing the field
+              }));
+            }}
+            iconType={isEditing ? 'close' : undefined}
           />
+
+          {errors.age && <Text style={styles.errorText}>{errors.age}</Text>}
 
           <Text style={styles.label}>gender</Text>
           <TextInput
@@ -369,6 +527,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
   },
+  cancelButton: {
+    backgroundColor: 'tomato',
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 13,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 12,
+    marginTop: 5,
+  },
   profileImage: {
     width: 100,
     height: 100,
@@ -387,11 +561,27 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
   },
+  editButton: {
+    backgroundColor: '#007BFF',
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 13,
+  },
+  saveButton: {
+    backgroundColor: 'green',
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 13,
+  },
   header: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 20,
+  },
+  actionButtons: {
+    flexDirection: 'row',
+    gap: 12,
   },
   form: {
     marginBottom: 20,

@@ -9,6 +9,7 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 type CustomModalProps = {
   isVisible: boolean;
@@ -20,6 +21,7 @@ type CustomModalProps = {
   buttonStyle?: StyleProp<ViewStyle>;
   buttonTextStyle?: StyleProp<TextStyle>;
   buttonText?: string;
+  isCancelVisible?: boolean;
 };
 
 const CustomModal: React.FC<CustomModalProps> = ({
@@ -41,25 +43,50 @@ const CustomModal: React.FC<CustomModalProps> = ({
       onRequestClose={onClose}>
       <View style={styles.overlay}>
         <View style={[styles.modalContainer, modalStyle]}>
-          <Text style={[styles.messageText, textStyle]}>{message}</Text>
-          <TouchableOpacity
-            onPress={onClose}
-            style={[styles.closeButton, buttonStyle]}>
-            <Text style={[styles.closeButtonText, buttonTextStyle]}>
-              {buttonText}
-            </Text>
-          </TouchableOpacity>
-          {onCancel ? (
+          {onCancel && (
             <TouchableOpacity
-              onPress={onCancel}
-              style={{backgroundColor: 'green', width: 40, height: 50}}>
+              style={{
+                position: 'absolute',
+                right: 1,
+                padding: 6,
+              }}
+              onPress={onCancel}>
+              <Icon name="close-circle" size={24} color="#555555" />
+            </TouchableOpacity>
+          )}
+          <Text
+            style={[
+              styles.messageText,
+              textStyle,
+              {marginTop: 10, marginBottom: 20},
+            ]}>
+            {message}
+          </Text>
+
+          <View style={{flexDirection: 'row', gap: 25}}>
+            <TouchableOpacity
+              onPress={onClose}
+              style={[styles.closeButton, buttonStyle]}>
               <Text style={[styles.closeButtonText, buttonTextStyle]}>
-                {'Cancel'}
+                {buttonText}
               </Text>
             </TouchableOpacity>
-          ) : (
-            ''
-          )}
+            {/* {onCancel ? (
+              <TouchableOpacity
+                onPress={onCancel}
+                style={[
+                  styles.closeButton,
+                  buttonStyle,
+                  {backgroundColor: 'green'},
+                ]}>
+                <Text style={[styles.closeButtonText, buttonTextStyle]}>
+                  {'Cancel'}
+                </Text>
+              </TouchableOpacity>
+            ) : (
+              ''
+            )} */}
+          </View>
         </View>
       </View>
     </Modal>

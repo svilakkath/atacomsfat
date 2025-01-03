@@ -246,7 +246,7 @@ export default function AddMedicineDetails({
   const handleClose = () => {
     setIsVisible(false);
     if (response?.success) {
-      navigation.navigate('WellnessPartnerList');
+      navigation.goBack();
     }
   };
 

@@ -86,7 +86,7 @@ export default function AddWellnessPartner({
   const handleClose = () => {
     setIsVisible(false);
     if (response?.success) {
-      navigation.navigate('WellnessPartnerList');
+      navigation.goBack();
     }
   };
 

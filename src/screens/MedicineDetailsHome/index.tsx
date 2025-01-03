@@ -1,17 +1,25 @@
-import {BottomSheet, CustomCard, Header, PreviewModal} from '@/components';
-import {RootStackParamList} from '@/types/common';
-import {NavigationProp, RouteProp, useRoute} from '@react-navigation/native';
-import React, {useEffect, useState} from 'react';
 import {
-  ActivityIndicator,
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+  BottomSheet,
+  CustomCard,
+  Header,
+  Loader,
+  PreviewModal,
+} from '@/components';
+import {RootStackParamList} from '@/types/common';
+import {
+  NavigationProp,
+  RouteProp,
+  useFocusEffect,
+  useRoute,
+} from '@react-navigation/native';
+import React, {useEffect, useState} from 'react';
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {MedicineDetailsProps} from '../types';
-import medicineDetailsService, {dayTimeImages} from './services';
+import medicineDetailsService, {
+  dayTimeImages,
+  medicineImages,
+} from './services';
 
 type MedicineDetailsHomeRouteProp = RouteProp<
   RootStackParamList,
@@ -27,19 +35,20 @@ const MedicineDetailsHome = ({
 }: MedicineDetailsHomeRoutePropNavigationProps) => {
   const route = useRoute<MedicineDetailsHomeRouteProp>();
   const {wellnessPartnerId} = route.params;
+  console.log('render');
 
-  const [medicinesList, setMedicinesList] = useState<MedicineDetailsProps[]>(
-    [],
-  );
-  const [loading, setLoading] = useState<boolean>(true);
   const [isVisible, setIsVisible] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [selecteName, setSelectedName] = useState<{
     id: string;
     name: string;
   } | null>(null);
   const [selectedMedicine, setSelectedMedicine] =
     useState<MedicineDetailsProps | null>(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [medicinesList, setMedicinesList] = useState<MedicineDetailsProps[]>(
+    [],
+  );
 
   useEffect(() => {
     getMedicineDetails();
@@ -53,6 +62,8 @@ const MedicineDetailsHome = ({
         await medicineDetailsService.getAllMedicineDetailsById(
           wellnessPartnerId,
         );
+      console.log(responseData);
+
       setMedicinesList(responseData);
     } catch (error) {
       console.error('Error fetching medicine details:', error);
@@ -69,12 +80,23 @@ const MedicineDetailsHome = ({
   async function handleDelete() {
     setIsModalVisible(false);
     if (selecteName && selecteName.id) {
-      const result = await medicineDetailsService.deleteMedicineById(
-        selecteName.id,
-      );
-      result.success
-        ? console.log(result.message)
-        : console.error(result.message);
+      try {
+        const result = await medicineDetailsService.deleteMedicineById(
+          selecteName.id,
+        );
+        if (result.success) {
+          setMedicinesList(prevMedicines =>
+            prevMedicines.filter(medicine => medicine.id !== selecteName.id),
+          );
+        }
+
+        result.success
+          ? console.log(result.message)
+          : console.error(result.message);
+      } catch (error) {
+        console.error('Error deleting medicine details:', error);
+      } finally {
+      }
     }
   }
 
@@ -87,7 +109,18 @@ const MedicineDetailsHome = ({
     setIsModalVisible(true);
     setSelectedName({id: item.id, name: item.name});
   };
+  const getMedicineImage = (name: string | undefined) => {
+    const foundImage = medicineImages.find(image => image.type === name);
+    return foundImage ? foundImage.image : 'https://via.placeholder.com/100';
+  };
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log('useFocusEffect');
 
+      getMedicineDetails();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [wellnessPartnerId]),
+  );
   return (
     <>
       <PreviewModal
@@ -101,24 +134,25 @@ const MedicineDetailsHome = ({
       />
 
       <View style={styles.container}>
-        <Header
-          title="Medicine Details"
-          onBackPress={() => navigation.goBack()}
-          rightComponent={
-            <TouchableOpacity
-              onPress={() =>
-                navigation.navigate('AddMedicineDetails', {wellnessPartnerId})
-              }
-              style={styles.addButton}>
-              <Text style={styles.addButtonText}>Add</Text>
-            </TouchableOpacity>
-          }
-        />
+        <View style={{marginBottom: 25}}>
+          <Header
+            title="Medicine Details"
+            onBackPress={() => navigation.goBack()}
+            rightComponent={
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate('AddMedicineDetails', {wellnessPartnerId})
+                }
+                style={styles.addButton}>
+                <Text style={styles.addButtonText}>Add</Text>
+              </TouchableOpacity>
+            }
+          />
+        </View>
 
         {loading ? (
           <View style={styles.loaderContainer}>
-            <ActivityIndicator size="large" color="#6200ee" />
-            <Text>Loading medicine details...</Text>
+            <Loader gap={15} size={20} />
           </View>
         ) : medicinesList.length > 0 ? (
           medicinesList.map(item => (
@@ -126,10 +160,14 @@ const MedicineDetailsHome = ({
               key={item.id}
               onPress={() => handleItemPress(item)}>
               <CustomCard
-                buttonTitle="Delete"
                 mainText={item.name}
-                onButtonPress={() => handleSettings(item)}
-                subText={item.doseDetails}
+                subText={item.medicineType}
+                imageUrl={getMedicineImage(item.medicineType)}
+                rightComponent={
+                  <TouchableOpacity onPress={() => handleSettings(item)}>
+                    <Icon name="trash-can-outline" size={24} color="#cd5c5c" />
+                  </TouchableOpacity>
+                }
               />
             </TouchableOpacity>
           ))
@@ -202,7 +240,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#dcdcdc',
   },
   addButton: {
     height: 35,

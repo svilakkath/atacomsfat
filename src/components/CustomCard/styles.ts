@@ -14,17 +14,19 @@ const useStyles = () => {
       shadowOpacity: 0.2,
       shadowRadius: 4,
       elevation: 2,
+      justifyContent: 'center',
     },
     image: {
-      width: 50,
-      height: 50,
-      borderRadius: 25,
+      width: 65,
+      height: 65,
+      borderRadius: 15,
       marginRight: 10,
       backgroundColor: '#ccc', // Fallback background color if image fails to load.
     },
     detailsContainer: {
       flex: 1,
       flexDirection: 'column',
+      textAlign: 'center',
     },
   });
 };

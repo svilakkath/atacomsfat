@@ -116,3 +116,22 @@ export const dayTimeImages = [
   },
   {timeOfDay: 'Night', image: require('@/assets/images/DayTimes/night.png')},
 ];
+
+export const medicineImages = [
+  {
+    type: 'Capsule',
+    image: require('@/assets/images/Medicines/capsule-color.png'),
+  },
+  {
+    type: 'Injection',
+    image: require('@/assets/images/Medicines/injection-color.png'),
+  },
+  {
+    type: 'Ointment',
+    image: require('@/assets/images/Medicines/ointment-color.png'),
+  },
+  {
+    type: 'Syrup',
+    image: require('@/assets/images/Medicines/syrup-color.png'),
+  },
+];
