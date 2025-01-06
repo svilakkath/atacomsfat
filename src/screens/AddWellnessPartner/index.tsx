@@ -70,6 +70,13 @@ export default function AddWellnessPartner({
         uid,
       );
       setResponse(response);
+      if (response?.success) {
+        setTimeout(async () => {
+          await wellnessPartnerService.syncWellnessPartnersToFirestore(
+            response.id ?? '',
+          );
+        }, 2000);
+      }
       setIsVisible(true);
     } catch (error) {
       console.error('Error adding wellness partner:', error);

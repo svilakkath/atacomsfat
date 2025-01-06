@@ -3,6 +3,7 @@ import User from '@/database/models/User';
 import WellnessPartner from '@/database/models/WellnessPartner';
 import {AddWellnessPartnerProps, ValidationRules} from '@/screens/types';
 import {Q} from '@nozbe/watermelondb';
+import firestore from '@react-native-firebase/firestore';
 
 const wellnessPartnerService = {
   createWellnessPartner: async (
@@ -81,6 +82,38 @@ const wellnessPartnerService = {
     const partners = await wellnessPartnerCollection.query().fetch();
     const formattedPartners = partners.map((partner: any) => partner._raw);
     console.log('wellness partners ==>', formattedPartners);
+  },
+  syncWellnessPartnersToFirestore: async (wellnessPartnerId: string) => {
+    try {
+      const wellnessPartnersCollection =
+        firestore().collection('wellness_partners');
+      const wellnessPartner = await database.collections
+        .get<WellnessPartner>('wellness_partners')
+        .find(wellnessPartnerId);
+
+      if (wellnessPartner) {
+        const batch = firestore().batch();
+        const partnerRef = wellnessPartnersCollection.doc(wellnessPartner.id);
+
+        batch.set(partnerRef, {
+          full_name: wellnessPartner.fullName,
+          phone_number: wellnessPartner.phoneNumber,
+          age: wellnessPartner.age,
+          gender: wellnessPartner.gender,
+          profile_image: wellnessPartner.profileImage || null,
+          user_id: wellnessPartner.user.id,
+          created_at: wellnessPartner.createdAt,
+          updated_at: wellnessPartner.updatedAt,
+        });
+
+        await batch.commit();
+        console.log('Wellness partner synced to Firestore successfully');
+      } else {
+        console.log('No wellness partner found with the given ID');
+      }
+    } catch (error) {
+      console.error('Error syncing wellness partner to Firestore:', error);
+    }
   },
 };
 export default wellnessPartnerService;

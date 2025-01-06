@@ -4,6 +4,7 @@ import MedicineTiming from '@/database/models/medicineTiming';
 import {AddMedicineDetailsProps, ValidationRules} from '@/screens/types';
 import {DayTimeValues} from '@/types/common';
 import {Q} from '@nozbe/watermelondb';
+import firestore from '@react-native-firebase/firestore';
 
 const medicineDetailsService = {
   addMedicineDetails: async (
@@ -133,6 +134,66 @@ const medicineDetailsService = {
     const formattedPartners = partners.map((partner: any) => partner._raw);
 
     console.log('mnedicine details==>', formattedPartners);
+  },
+  syncMedicineDetailsToFirestore: async (medicineId: string) => {
+    try {
+      const medicineDetailsCollection =
+        firestore().collection('medicines_details');
+      const medicineTimingsCollection =
+        firestore().collection('medicine_timings');
+
+      const medicineDetails = await database.collections
+        .get<MedicineDetails>('medicines_details')
+        .find(medicineId);
+
+      if (medicineDetails) {
+        const batch = firestore().batch();
+
+        const medicineRef = medicineDetailsCollection.doc(medicineDetails.id);
+
+        batch.set(medicineRef, {
+          name: medicineDetails.name,
+          dose_details: medicineDetails.doseDetails,
+          medicine_type: medicineDetails.medicineType,
+          medicine_duration: medicineDetails.medicineDuration,
+          additional_note: medicineDetails.additionalNote,
+          remaining_number_of_medicine:
+            medicineDetails.remainingNumberOfMedicine,
+          wellness_partner_id: medicineDetails.wellnessPartner.id,
+          created_at: medicineDetails.createdAt,
+          updated_at: medicineDetails.updatedAt,
+        });
+
+        const medicineTimings = await database.collections
+          .get<MedicineTiming>('medicine_timings')
+          .query(Q.where('medicine_id', medicineDetails.id))
+          .fetch();
+
+        medicineTimings.forEach(timing => {
+          const timingRef = medicineTimingsCollection.doc(timing.id);
+
+          batch.set(timingRef, {
+            time_of_day: timing.timeOfDay,
+            time: timing.time,
+            medicine_id: timing.medicine.id,
+            created_at: timing.createdAt,
+            updated_at: timing.updatedAt,
+          });
+        });
+
+        await batch.commit();
+        console.log(
+          'Medicine details and timings synced to Firestore successfully',
+        );
+      } else {
+        console.log('No medicine found with the provided ID');
+      }
+    } catch (error) {
+      console.error(
+        'Error syncing medicine details and timings to Firestore:',
+        error,
+      );
+    }
   },
 };
 

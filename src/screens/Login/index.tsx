@@ -37,7 +37,9 @@ const Login = ({navigation}: LoginNavigationProps) => {
       await auth().signInWithEmailAndPassword(emailAddress, password);
       console.log('Success', 'You are logged in');
 
-      navigation.navigate('Home');
+      navigation.navigate('BottomNavigator', {
+        screen: 'Home',
+      });
     } catch (error) {
       console.error('Login Error:', error);
       console.log('Error', 'Invalid credentials or problem logging in');

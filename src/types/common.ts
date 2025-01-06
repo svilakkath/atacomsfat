@@ -37,15 +37,17 @@ export type IconTypes = 'password' | 'close' | 'magnify';
 export type DayTimeValues = 'Morning' | 'Afternoon' | 'Evening' | 'Night';
 
 export type RootStackParamList = {
+  BottomNavigator: {screen?: string; params?: any};
   Home: undefined;
   Settings: undefined;
   Login: undefined;
   SignUp: undefined;
-  BottomNavigator: undefined;
+  // BottomNavigator: undefined;
   AddWellnessPartner: undefined;
   AddMedicineDetails: {wellnessPartnerId: string};
   WellnessPartnerHome: {wellnessPartner: AllWellnessPartnersDetailsProps};
   WellnessPartnerList: undefined;
   MedicineDetailsHome: {wellnessPartnerId: string};
   WellnessPartnerProfile: {wellnessPartnerId: string};
+  Profile: undefined;
 };

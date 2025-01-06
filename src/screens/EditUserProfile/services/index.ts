@@ -1,6 +1,7 @@
 import {database} from '@/database/database';
 import User from '@/database/models/User';
 import {Q} from '@nozbe/watermelondb';
+import auth from '@react-native-firebase/auth';
 
 const userProfileServices = {
   getUserDetails: async (
@@ -188,6 +189,27 @@ const userProfileServices = {
       };
     } catch (error) {
       console.error('Error deleting user photo:', error);
+      return {
+        success: false,
+        message: `Error: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`,
+      };
+    }
+  },
+  signOutUser: async (): Promise<{
+    success: boolean;
+    message: string;
+  }> => {
+    try {
+      await auth().signOut();
+
+      return {
+        success: true,
+        message: 'User signed out successfully.',
+      };
+    } catch (error) {
+      console.error('Error signing out:', error);
       return {
         success: false,
         message: `Error: ${

@@ -42,6 +42,8 @@ const WellnessPartnerList = ({navigation}: WellnessListProps) => {
         uid,
       );
       if (responseData) {
+        console.log('res--->', responseData);
+
         setPartners(responseData);
       }
     } catch (error) {

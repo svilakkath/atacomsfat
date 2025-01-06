@@ -126,6 +126,12 @@ const SignUp = ({navigation}: LoginProps) => {
 
   const handleUserData = async (uid: string) => {
     await userService.createUser(form, uid);
+    navigation.navigate('BottomNavigator', {
+      screen: 'Home',
+    });
+    setTimeout(() => {
+      syncToFirestoreDatabase();
+    }, 2000);
   };
 
   const handleInputChange = (field: keyof UserSignupProps, value: string) => {
@@ -133,6 +139,10 @@ const SignUp = ({navigation}: LoginProps) => {
     if (validationRules[field]?.required && value) {
       setErrors(prevErrors => ({...prevErrors, [field]: ''}));
     }
+  };
+
+  const syncToFirestoreDatabase = async () => {
+    await userService.syncUsersToFirestore();
   };
 
   return (

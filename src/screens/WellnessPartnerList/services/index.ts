@@ -14,6 +14,8 @@ const wellnessPartnerList = {
     const users = await userCollection
       .query(Q.where('user_auth_id', uid))
       .fetch();
+    console.log('user list==>', users);
+
     if (users.length === 0) {
       return [];
     }

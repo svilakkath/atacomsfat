@@ -195,6 +195,13 @@ export default function AddMedicineDetails({
         wellnessPartnerId,
       );
       setResponse(response);
+      if (response.success) {
+        setTimeout(async () => {
+          await medicineDetailsService.syncMedicineDetailsToFirestore(
+            response.id ?? '',
+          );
+        }, 2000);
+      }
       setIsVisible(true);
     } catch (error) {
       console.error('Error adding  medicine details:', error);

@@ -23,6 +23,8 @@ export default function AppNavigator() {
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(authUser => {
       if (authUser?.uid) {
+        console.log('users====>', authUser);
+
         setUser(authUser.uid);
       } else {
         clearUser();
@@ -84,6 +86,7 @@ export default function AppNavigator() {
         component={WellnessPartnerProfile}
         options={{title: 'Profile'}}
       />
+      {/* <Stack.Screen name="Home" component={Home} options={{title: 'Home'}} /> */}
     </Stack.Navigator>
   );
 }

@@ -10,6 +10,7 @@ import {NavigationProp, RouteProp, useRoute} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import ImagePicker from 'react-native-image-crop-picker';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {WellnessPartnerProfileProps} from '../types';
 import wellnessPartnerProfileService from './services';
 
@@ -227,6 +228,11 @@ const WellnessPartnerProfile = ({
   const handleCancel = () => {
     setIsEditing(false);
     setWellNessPartnerDetails(initialWellnessPartnerDetails);
+    setErrors({
+      age: '',
+      fullName: '',
+      phoneNumber: '',
+    });
   };
 
   useEffect(() => {
@@ -269,7 +275,8 @@ const WellnessPartnerProfile = ({
           <TouchableOpacity
             style={styles.editImageButton}
             onPress={() => setIsBottomSheetVisible(true)}>
-            <Text style={styles.editImageText}>Add photo</Text>
+            {/* <Text style={styles.editImageText}>Add photo</Text> */}
+            <Icon name="camera" size={28} color="#555555" />
           </TouchableOpacity>
         </View>
 
@@ -552,7 +559,7 @@ const styles = StyleSheet.create({
   },
   editImageButton: {
     marginTop: 10,
-    backgroundColor: '#007BFF',
+    // backgroundColor: '#007BFF',
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 20,

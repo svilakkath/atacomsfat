@@ -2,6 +2,7 @@ import {database} from '@/database/database';
 import User from '@/database/models/User';
 import {UserSignupProps} from '@/screens/types';
 import {hashPassword} from '@/utils/helper';
+import firestore from '@react-native-firebase/firestore';
 
 const userService = {
   createUser: async (form: UserSignupProps, uid: string) => {
@@ -48,6 +49,37 @@ const userService = {
       });
     } catch (error) {
       console.error('Error deleting wellness partners:', error);
+    }
+  },
+  syncUsersToFirestore: async () => {
+    try {
+      const usersCollection = firestore().collection('users');
+      const users = await database.collections
+        .get<User>('users')
+        .query()
+        .fetch();
+
+      // Use Firestore batch for efficient writes
+      const batch = firestore().batch();
+
+      users.forEach((user: User) => {
+        const userRef = usersCollection.doc(user.userAuthId);
+        batch.set(userRef, {
+          full_name: user.fullName,
+          phone_number: user.phoneNumber,
+          email_address: user.emailAddress,
+          password: user.password,
+          profile_image: user.profileImage || null,
+          user_auth_id: user.userAuthId,
+          created_at: user.createdAt,
+          updated_at: user.updatedAt,
+        });
+      });
+
+      await batch.commit();
+      console.log('Users synced to Firestore successfully');
+    } catch (error) {
+      console.error('Error syncing users to Firestore:', error);
     }
   },
 };

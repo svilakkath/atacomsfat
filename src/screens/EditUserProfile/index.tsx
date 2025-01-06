@@ -1,9 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import {BottomSheet, Loader, PreviewModal, TextInput} from '@/components';
 import {useUserStore} from '@/store';
+import {RootStackParamList} from '@/types/common';
+import {NavigationProp} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import ImagePicker from 'react-native-image-crop-picker';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import userProfileServices from './services';
 
 type UserProps = {
@@ -18,13 +21,18 @@ type ResponseProp = {
   message: string;
 };
 
-const EditUserProfile = () => {
+type LoginNavigation = {
+  navigation: NavigationProp<RootStackParamList, 'Profile'>;
+};
+
+const EditUserProfile = ({navigation}: LoginNavigation) => {
   const {uid} = useUserStore();
   const [userDetails, setUserDetails] = useState<UserProps | null>(null);
   const [initialUserDetails, setInitialUserDetails] =
     useState<UserProps | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
   console.log('vibing');
 
   const [loader, setLoader] = useState(false);
@@ -34,6 +42,7 @@ const EditUserProfile = () => {
     'https://via.placeholder.com/100',
   );
   const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);
+  const [isLogoutmodal, setIsLogoutmodal] = useState(false);
   const [responseMsg, setResponseMsg] = useState<ResponseProp | null>(null);
   const [errors, setErrors] = useState<{
     fullName?: string;
@@ -192,6 +201,14 @@ const EditUserProfile = () => {
   const handleCancel = () => {
     setIsEditing(false);
     setUserDetails(initialUserDetails);
+    setErrors({fullName: '', phoneNumber: ''});
+  };
+
+  const handleLogOut = async () => {
+    const res = await userProfileServices.signOutUser();
+    if (res.success) {
+      navigation.navigate('Login');
+    }
   };
 
   useEffect(() => {
@@ -214,6 +231,16 @@ const EditUserProfile = () => {
           }
         />
       )}
+      {isLogoutmodal && (
+        <PreviewModal
+          isVisible={isLogoutmodal}
+          message={'Are you sure want to LogOut ?'}
+          onClose={handleLogOut}
+          buttonText={isLoading ? 'Loading..' : 'Log Out'}
+          buttonStyle={styles.failButton}
+          onCancel={() => setIsLogoutmodal(false)}
+        />
+      )}
       <View style={styles.container}>
         <View style={styles.imageContainer}>
           <Image
@@ -223,7 +250,8 @@ const EditUserProfile = () => {
           <TouchableOpacity
             style={styles.editImageButton}
             onPress={() => setIsBottomSheetVisible(true)}>
-            <Text style={styles.editImageText}>Add photo</Text>
+            {/* <Text style={styles.editImageText}>Add photo</Text> */}
+            <Icon name="camera" size={28} color="#555555" />
           </TouchableOpacity>
         </View>
 
@@ -329,6 +357,11 @@ const EditUserProfile = () => {
             editable={false}
             onChangeText={() => {}}
           />
+          <TouchableOpacity
+            style={styles.logOutButton}
+            onPress={() => setIsLogoutmodal(true)}>
+            <Text style={styles.buttonText}>Log Out</Text>
+          </TouchableOpacity>
         </View>
       </View>
       <BottomSheet
@@ -378,10 +411,11 @@ const styles = StyleSheet.create({
   },
   editImageButton: {
     marginTop: 10,
-    backgroundColor: '#007BFF',
+    // backgroundColor: '#007BFF',
     paddingVertical: 6,
-    paddingHorizontal: 12,
+    paddingHorizontal: 15,
     borderRadius: 20,
+    // marginLeft: 20,
   },
   errorText: {
     color: 'red',
@@ -460,5 +494,15 @@ const styles = StyleSheet.create({
     color: '#fff',
     textAlign: 'center',
     fontWeight: 'bold',
+  },
+  logOutButton: {
+    backgroundColor: 'tomato',
+    paddingVertical: 6,
+    // paddingHorizontal: 10,
+    borderRadius: 13,
+    padding: 10,
+    alignItems: 'center',
+    width: 80,
+    marginTop: 20,
   },
 });
