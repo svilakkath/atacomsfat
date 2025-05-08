@@ -1,28 +1,24 @@
-import {StyleSheet} from 'react-native';
+import {Dimensions, StyleSheet} from 'react-native';
+
+const {width} = Dimensions.get('window');
 
 const useStyles = () => {
   return StyleSheet.create({
     container: {
-      margin: 20,
       padding: 15,
-      backgroundColor: '#F5F5F5',
-      borderRadius: 10,
-      shadowColor: '#000',
-      shadowOffset: {width: 0, height: 2},
-      shadowOpacity: 0.2,
-      shadowRadius: 4,
-      elevation: 5,
+      backgroundColor: '#389EBA',
+      borderRadius: 12,
+      width: '100%',
     },
     header: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginBottom: 15,
+      marginBottom: 0,
     },
     imagePlaceholder: {
-      width: 50,
-      height: 50,
-      borderRadius: 25,
-      backgroundColor: '#E0E0E0',
+      width: 60,
+      height: 60,
+      borderRadius: 30,
       justifyContent: 'center',
       alignItems: 'center',
       marginRight: 15,
@@ -32,60 +28,77 @@ const useStyles = () => {
     },
     infoRow: {
       flexDirection: 'row',
-      marginBottom: 5,
+      marginBottom: 3,
+      maxWidth: '100%',
     },
     doseRow: {
       flexDirection: 'row',
       alignItems: 'center',
+      flexWrap: 'wrap',
+      marginTop: 5,
     },
     separator: {
       height: 15,
-      width: 4,
-      backgroundColor: 'gray',
-      marginHorizontal: 5,
+      width: 2,
+      backgroundColor: '#B0B0B0',
+      marginHorizontal: 8,
     },
     timeSection: {
-      marginBottom: 15,
+      marginBottom: 0,
     },
     timeRow: {
       flexDirection: 'row',
       alignItems: 'center',
     },
     spacer: {
-      width: 10,
+      width: 15,
     },
     divider: {
       height: 1,
-      backgroundColor: 'gray',
-      marginVertical: 10,
+      backgroundColor: '#E0E0E0',
+      marginVertical: 15,
     },
     actionButtons: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      marginTop: 15,
+      alignItems: 'center',
+      marginTop: 10,
     },
     actionItem: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginBottom: 5,
+      justifyContent: 'center',
+      flex: 1,
+      marginHorizontal: 5,
+      gap: 2,
     },
     smallImagePlaceholder: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
-      backgroundColor: '#E0E0E0',
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginRight: 10,
-    },
-    doneButton: {
       width: 50,
       height: 50,
       borderRadius: 25,
-      backgroundColor: '#D4EDDA',
       justifyContent: 'center',
       alignItems: 'center',
     },
+    doneButton: {
+      width: width * 0.3,
+      borderRadius: 25,
+      justifyContent: 'center',
+    },
+    skipButton: {
+      width: width * 0.3,
+      height: 50,
+      borderRadius: 25,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    fullNameText: {
+      fontSize: 18,
+      fontWeight: '400',
+      color: '#fff',
+      flexWrap: 'wrap',
+      maxWidth: width - 140, // Adjust width dynamically based on available space
+    },
   });
 };
+
 export default useStyles;

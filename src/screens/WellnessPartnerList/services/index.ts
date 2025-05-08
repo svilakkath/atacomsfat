@@ -4,6 +4,7 @@ import MedicineTiming from '@/database/models/medicineTiming';
 import WellnessPartner from '@/database/models/WellnessPartner';
 import {AllWellnessPartnersDetailsProps} from '@/screens/types';
 import {Q} from '@nozbe/watermelondb';
+import firestore from '@react-native-firebase/firestore';
 
 const wellnessPartnerList = {
   getWellnessPartnersList: async (
@@ -14,7 +15,7 @@ const wellnessPartnerList = {
     const users = await userCollection
       .query(Q.where('user_auth_id', uid))
       .fetch();
-    console.log('user list==>', users);
+    // console.log('user list==>', users);
 
     if (users.length === 0) {
       return [];
@@ -97,6 +98,51 @@ const wellnessPartnerList = {
         success: false,
         message: `Failed to delete wellness partner: ${error}`,
       };
+    }
+  },
+  deleteWellnessPartnerFromFirestore: async (partnerId: string) => {
+    try {
+      const wellnessPartnerCollection =
+        firestore().collection('wellness_partners');
+      const medicineDetailsCollection =
+        firestore().collection('medicines_details');
+      const medicineTimingsCollection =
+        firestore().collection('medicine_timings');
+
+      const batch = firestore().batch();
+
+      const partnerRef = wellnessPartnerCollection.doc(partnerId);
+
+      const medicinesSnapshot = await medicineDetailsCollection
+        .where('wellness_partner_id', '==', partnerId)
+        .get();
+
+      for (const medicineDoc of medicinesSnapshot.docs) {
+        const medicineId = medicineDoc.id;
+
+        const timingsSnapshot = await medicineTimingsCollection
+          .where('medicine_id', '==', medicineId)
+          .get();
+
+        timingsSnapshot.forEach(timingDoc => {
+          batch.delete(timingDoc.ref);
+        });
+
+        batch.delete(medicineDoc.ref);
+      }
+
+      batch.delete(partnerRef);
+
+      await batch.commit();
+
+      console.log(
+        `Wellness partner with ID ${partnerId} and all related data deleted successfully from Firestore.`,
+      );
+    } catch (error) {
+      console.error(
+        `Error deleting wellness partner with ID ${partnerId} and related data from Firestore:`,
+        error,
+      );
     }
   },
 };

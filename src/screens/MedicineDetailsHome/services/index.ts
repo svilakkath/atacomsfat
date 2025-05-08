@@ -6,6 +6,7 @@ import {
   MedicineDetailsTimingProps,
 } from '@/screens/types';
 import {Q} from '@nozbe/watermelondb';
+import firestore from '@react-native-firebase/firestore';
 
 const medicineDetailsService = {
   getAllMedicineDetailsById: async (
@@ -96,6 +97,39 @@ const medicineDetailsService = {
         success: false,
         message: `Failed to delete medicine: ${error}`,
       };
+    }
+  },
+  deleteMedicineFromFirestore: async (medicineId: string) => {
+    try {
+      const medicineDetailsCollection =
+        firestore().collection('medicines_details');
+      const medicineTimingsCollection =
+        firestore().collection('medicine_timings');
+
+      const batch = firestore().batch();
+
+      const medicineRef = medicineDetailsCollection.doc(medicineId);
+
+      batch.delete(medicineRef);
+
+      const timingsSnapshot = await medicineTimingsCollection
+        .where('medicine_id', '==', medicineId)
+        .get();
+
+      timingsSnapshot.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+
+      await batch.commit();
+
+      console.log(
+        `Medicine with ID ${medicineId} and its associated timings deleted successfully from Firestore.`,
+      );
+    } catch (error) {
+      console.error(
+        `Error deleting medicine with ID ${medicineId} and its timings from Firestore:`,
+        error,
+      );
     }
   },
 };

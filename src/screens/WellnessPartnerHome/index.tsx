@@ -44,7 +44,6 @@ const WellnessPartnerHome = ({navigation}: WellnessHomeProps) => {
       </View>
     </TouchableOpacity>
   );
-
   return (
     <View style={{padding: 16}}>
       <Header

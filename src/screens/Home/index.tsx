@@ -1,76 +1,72 @@
-import {database} from '@/database/database';
-import User from '@/database/models/User';
+import { Alert } from '@/components';
 import React from 'react';
-import {Button, StyleSheet, View} from 'react-native';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
+
+type MedicineTypes = 'Capsule' | 'Injection' | 'Ointment' | 'Syrup';
+type Items = {
+  id: number;
+  doseDetails: string;
+  fullName: string;
+  medicineName: string;
+  medicineType: MedicineTypes;
+};
 
 const Home = () => {
-  // const deleteWellnessPartnerById = async () => {
-  //   try {
-  //     await database.write(async () => {
-  //       const wellnessPartnerCollection = database.get('wellness_partners');
-  //       const partner = await wellnessPartnerCollection.find(
-  //         'tmQTCkFzIjMWZgT9',
-  //       );
+  const data: Items[] = [
+    {
+      id: 1,
+      doseDetails: '120 mg',
+      fullName: 'name 1',
+      medicineName: 'dolo',
+      medicineType: 'Capsule',
+    },
+  ];
 
-  //       if (partner) {
-  //         await partner.destroyPermanently();
-  //         console.log(
-  //           `Wellness partner with ID ${'wkoDL1r8udPFKu9v'} has been deleted.`,
-  //         );
-  //       } else {
-  //         console.log(
-  //           `No wellness partner found with ID ${'wkoDL1r8udPFKu9v'}.`,
-  //         );
-  //       }
-  //     });
-  //   } catch (error) {
-  //     console.error(
-  //       `Error deleting wellness partner with ID ${'wkoDL1r8udPFKu9v'}:`,
-  //       error,
-  //     );
-  //     throw error;
-  //   }
-  // };
+  const renderItems = ({item}: {item: Items}) => {
+    return (
+      // <View style={styles.itemContainer}>
+      <Alert
+        doseDetails={item.doseDetails}
+        fullName={item.fullName}
+        medicineName={item.medicineName}
+        medicineType={item.medicineType}
+      />
 
-  const deleteAllUsers = async () => {
-    try {
-      const userCollection = database.collections.get<User>('users');
-
-      // Fetch all users from the table
-      const allUsers = await userCollection.query().fetch();
-
-      if (allUsers.length === 0) {
-        console.log('No users to delete');
-        return;
-      }
-
-      // Start a write transaction to delete all users
-      await database.write(async () => {
-        // Prepare and delete each user
-        const deletions = allUsers.map(user =>
-          user.prepareDestroyPermanently(),
-        );
-        await database.batch(...deletions);
-      });
-
-      console.log('All users deleted successfully');
-    } catch (error) {
-      console.error('Error deleting users:', error);
-    }
+      // </View>
+    );
   };
 
-  const getWellnessPartnerById = async () => {
-    const wellnessPartnerCollection = await database.get('medicine_timings');
-    const partners = await wellnessPartnerCollection.query().fetch();
-    const formattedPartners = partners.map((partner: any) => partner._raw);
-
-    console.log('mnedicine details==>', formattedPartners);
+  const handleGet = async () => {
+    await fetch('http://192.168.1.4:5500/api/v1/users')
+      .then(res => res.json())
+      .then(data => console.log(data.data.users))
+      .catch(err => {
+        console.log(err);
+      });
   };
 
   return (
     <View style={styles.container}>
-      <Button title="delete" onPress={deleteAllUsers} />
-      <Button title="get" onPress={getWellnessPartnerById} />
+      <View>
+        <Text style={styles.greetingText}>Hello,</Text>
+        <Text style={styles.nameText}>Samadu</Text>
+
+        <View style={{}}>
+          <View style={styles.activitiesHeader}>
+            <Text style={styles.activitiesTitle}>Today's activities</Text>
+          </View>
+          {/* <View> */}
+          <FlatList
+            data={data}
+            renderItem={renderItems}
+            keyExtractor={item => item.id.toString()}
+            horizontal={true}
+            ItemSeparatorComponent={() => <View style={styles.itemSeparator} />}
+          />
+          {/* <Button title="click" onPress={handleGet} /> */}
+          {/* </View> */}
+        </View>
+      </View>
     </View>
   );
 };
@@ -80,16 +76,30 @@ export default Home;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#dcdcdc',
-    // opacity: 0.5,
+    padding: 20,
+    backgroundColor: '#F9F9F9',
   },
-  blurBackground: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
-    height: '100%',
-    opacity: 0.5,
+  greetingText: {
+    fontSize: 21,
+    color: '#333333',
+  },
+  nameText: {
+    fontSize: 24,
+    color: '#2F4F4F',
+    fontWeight: '500',
+    marginTop: 5,
+  },
+  activitiesSection: {
+    marginTop: 35,
+  },
+  activitiesHeader: {
+    marginBottom: 15,
+  },
+  activitiesTitle: {
+    fontSize: 19,
+    color: '#555555',
+  },
+  itemSeparator: {
+    width: 10,
   },
 });

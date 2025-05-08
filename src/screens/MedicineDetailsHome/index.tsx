@@ -88,6 +88,11 @@ const MedicineDetailsHome = ({
           setMedicinesList(prevMedicines =>
             prevMedicines.filter(medicine => medicine.id !== selecteName.id),
           );
+          setTimeout(async () => {
+            await medicineDetailsService.deleteMedicineFromFirestore(
+              selecteName.id,
+            );
+          }, 2000);
         }
 
         result.success

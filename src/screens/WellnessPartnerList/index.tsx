@@ -18,7 +18,6 @@ const WellnessPartnerList = ({navigation}: WellnessListProps) => {
   const [partners, setPartners] = useState<AllWellnessPartnersDetailsProps[]>(
     [],
   );
-  console.log('rendering');
 
   const [loading, setLoading] = useState<boolean>(true);
   const [deleteoading, setDeleteLoading] = useState<boolean>(false);
@@ -42,7 +41,7 @@ const WellnessPartnerList = ({navigation}: WellnessListProps) => {
         uid,
       );
       if (responseData) {
-        console.log('res--->', responseData);
+        // console.log('res--->', responseData);
 
         setPartners(responseData);
       }
@@ -70,6 +69,11 @@ const WellnessPartnerList = ({navigation}: WellnessListProps) => {
           setPartners(prevPartners =>
             prevPartners.filter(partner => partner.id !== selectePartner.id),
           );
+          setTimeout(async () => {
+            await wellnessPartnerList.deleteWellnessPartnerFromFirestore(
+              selectePartner.id,
+            );
+          }, 2000);
         }
       } catch (error) {
         console.error('Error fetching wellness partners:', error);

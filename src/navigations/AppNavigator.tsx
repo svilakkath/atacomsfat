@@ -23,8 +23,6 @@ export default function AppNavigator() {
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(authUser => {
       if (authUser?.uid) {
-        console.log('users====>', authUser);
-
         setUser(authUser.uid);
       } else {
         clearUser();
@@ -38,9 +36,7 @@ export default function AppNavigator() {
   if (loading) {
     return null;
   }
-  // async function SignOut() {
-  //   await auth().signOut();
-  // }
+
   return (
     <Stack.Navigator
       initialRouteName={uid ? 'BottomNavigator' : 'Login'}

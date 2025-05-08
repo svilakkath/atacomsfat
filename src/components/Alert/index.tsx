@@ -1,6 +1,6 @@
 import React from 'react';
-import {TouchableOpacity, View} from 'react-native';
-import Text from '../Text';
+import {Image, Text as RnText, TouchableOpacity, View} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import useStyles from './styles';
 
 type MedicineTypes = 'Capsule' | 'Injection' | 'Ointment' | 'Syrup';
@@ -12,8 +12,8 @@ type AlertProps = {
   doseDetails: string;
   medicineType?: MedicineTypes;
   timeOfDay?: TimeOfDay;
-  time: string;
-  currentTimeOfDay: string;
+  time?: string;
+  currentTimeOfDay?: string;
 };
 
 export default function CustomAlert({
@@ -28,59 +28,93 @@ export default function CustomAlert({
   const styles = useStyles();
   return (
     <View style={styles.container}>
-      {/* Header Section */}
       <View style={styles.header}>
-        {/* Placeholder for Image */}
         <View style={styles.imagePlaceholder}>
-          <Text title="Img" />
+          <Image
+            source={require('@/assets/images/Medicines/injection-hignlight.png')}
+            style={{height: 60, width: 60}}
+          />
         </View>
 
-        {/* Medicine Info */}
         <View style={styles.infoContainer}>
           <View style={styles.infoRow}>
-            <Text title={`Medicine for: ${fullName}`} />
+            <RnText
+              style={{
+                fontSize: 22,
+                fontWeight: '500',
+                color: '#fff',
+                flexShrink: 1,
+                overflow: 'hidden',
+                maxWidth: '100%', // Adjust to limit the width
+              }}
+              numberOfLines={1}
+              ellipsizeMode="tail">
+              {medicineName}
+            </RnText>
           </View>
-          <Text title={`Medicine Name: ${medicineName}`} />
+          <RnText
+            style={{
+              fontSize: 18,
+              fontWeight: '400',
+              color: '#fff',
+              width: 'auto',
+            }}>{`Wellness Partner : ${fullName}`}</RnText>
           <View style={styles.doseRow}>
-            <Text title={`Dose: ${doseDetails}`} />
+            <RnText
+              style={{
+                fontSize: 15,
+                fontWeight: '400',
+                color: '#fff',
+              }}>
+              {doseDetails}
+            </RnText>
             <View style={styles.separator} />
-            <Text title={medicineType} />
+            <RnText
+              style={{
+                fontSize: 16,
+                fontWeight: '400',
+                color: '#fff',
+              }}>
+              {medicineType}
+            </RnText>
           </View>
-        </View>
-      </View>
-
-      {/* Time Section */}
-      <View style={styles.timeSection}>
-        <Text title="Timing" />
-        <View style={styles.timeRow}>
-          <Text title={currentTimeOfDay} />
-          <View style={styles.spacer} />
-          <Text title={time} />
+          <View
+            style={{
+              marginTop: 20,
+            }}>
+            <RnText style={{fontSize: 16, fontWeight: '400', color: '#fff'}}>
+              {'After breakfast'}
+            </RnText>
+            <RnText style={{fontSize: 16, fontWeight: '400', color: '#fff'}}>
+              {'10:00 AM'}
+            </RnText>
+          </View>
         </View>
       </View>
 
       {/* Separator */}
       <View style={styles.divider} />
 
-      {/* Action Buttons */}
       <View style={styles.actionButtons}>
-        {/* Skip Button */}
         <View style={styles.actionItem}>
           <View style={styles.smallImagePlaceholder}>
-            <Text title="Img" />
+            <Icon name="close" size={28} color="#fff" />
           </View>
           <TouchableOpacity>
-            <Text title="Skip" />
+            <RnText style={{fontSize: 21, fontWeight: '400', color: '#fff'}}>
+              Skip
+            </RnText>
           </TouchableOpacity>
         </View>
 
-        {/* Done Button */}
         <View style={styles.actionItem}>
           <View style={styles.smallImagePlaceholder}>
-            <Text title="Img" />
+            <Icon name="check" size={28} color="#fff" />
           </View>
           <TouchableOpacity style={styles.doneButton}>
-            <Text title="Done" />
+            <RnText style={{fontSize: 21, fontWeight: '400', color: '#fff'}}>
+              Done
+            </RnText>
           </TouchableOpacity>
         </View>
       </View>
